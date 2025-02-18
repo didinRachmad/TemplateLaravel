@@ -1,0 +1,41 @@
+html,
+body,
+.form-select,
+.form-control,
+.select2-container--bootstrap-5 .select2-selection {
+    font-size: 0.85rem !important;
+}
+
+:root {
+    --bs-body-font-size: 0.85rem !important;
+}
+
+.btn {
+    --bs-btn-font-size: 0.85rem !important;
+}
+
+.pagination {
+    --bs-pagination-font-size: 0.85rem !important;
+}
+
+
+a {
+    text-decoration: none;
+}
+
+.bg-gd {
+    --bs-table-bg: none;
+    background: linear-gradient(270deg, #73c9cc 0%, #2CA9BC 100%) !important;
+}
+
+/* Pastikan wadah pagination menggunakan flexbox dan meratakan konten ke kanan */
+div.dt-paging {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Atur margin dan fleksibilitas elemen pagination */
+div.dt-paging ul.pagination {
+    margin: 2px 0;
+    flex-wrap: wrap;
+}
