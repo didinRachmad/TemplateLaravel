@@ -15,7 +15,8 @@
             <div class="card-body">
                 <div class="form-group">
                     <label for="name">Nama Role</label>
-                    <input type="text" id="name" name="name" class="form-control" required>
+                    <input type="text" id="name" name="name" class="form-control"
+                        value="{{ old('name', $role->name) }}" required>
                 </div>
             </div>
             <div class="card-footer text-end">

@@ -18,8 +18,8 @@
                     <div class="form-group">
                         <label for="produksi" class="form-label">Produksi</label>
                         <select id="produksi" name="produksi" class="form-select" style="width: 100%;" required>
-                            <option value="P1" selected>P1</option>
-                            <option value="P2">P2</option>
+                            <option value="P1" {{ old('produksi') == 'P1' ? 'selected' : '' }}>P1</option>
+                            <option value="P2" {{ old('produksi') == 'P2' ? 'selected' : '' }}>P2</option>
                         </select>
                     </div>
                 </div>
@@ -30,15 +30,17 @@
                             <div class="form-group">
                                 <label for="kode_item" class="form-label">Kode Item</label>
                                 <select id="kode_item" name="kode_item" class="form-control" required>
-                                    <!-- Opsi untuk item -->
+                                    <option value="{{ old('kode_item', $kode_item ?? '') }}">
+                                        {{ old('kode_item', $kode_item ?? '') }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="nama_item" class="form-label">Nama Item</label>
-                                <input type="text" id="nama_item" name="nama_item" class="form-control bg-light"
-                                    readonly>
+                                <input type="text" id="nama_item" name="nama_item" class="form-control bg-light" readonly
+                                    value="{{ old('nama_item') }}">
                             </div>
                         </div>
                     </div>
@@ -48,8 +50,8 @@
                     <div class="form-group">
                         <label for="jenis" class="form-label">Jenis</label>
                         <select id="jenis" name="jenis" class="form-select" required>
-                            <option value="Baru" selected>Baru</option>
-                            <option value="Bekas">Bekas</option>
+                            <option value="Baru" {{ old('jenis') == 'Baru' ? 'selected' : '' }}>Baru</option>
+                            <option value="Bekas" {{ old('jenis') == 'Bekas' ? 'selected' : '' }}>Bekas</option>
                         </select>
                     </div>
                 </div>
@@ -58,8 +60,8 @@
                     <div class="form-group">
                         <label for="kondisi" class="form-label">Kondisi</label>
                         <select id="kondisi" name="kondisi" class="form-select" required>
-                            <option value="Baik" selected>Baik</option>
-                            <option value="Rusak">Rusak</option>
+                            <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>Baik</option>
+                            <option value="Rusak" {{ old('kondisi') == 'Rusak' ? 'selected' : '' }}>Rusak</option>
                         </select>
                     </div>
                 </div>
@@ -70,7 +72,9 @@
                             <div class="form-group">
                                 <label for="kode_lokasi" class="form-label">Kode Lokasi</label>
                                 <select id="kode_lokasi" name="kode_lokasi" class="form-control" required>
-                                    <!-- Opsi untuk lokasi -->
+                                    <option value="{{ old('kode_lokasi', $kode_lokasi ?? '') }}">
+                                        {{ old('kode_lokasi', $kode_lokasi ?? '') }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -78,7 +82,7 @@
                             <div class="form-group">
                                 <label for="nama_lokasi" class="form-label">Nama Lokasi</label>
                                 <input type="text" id="nama_lokasi" name="nama_lokasi" class="form-control bg-light"
-                                    readonly>
+                                    readonly value="{{ old('nama_lokasi') }}">
                             </div>
                         </div>
                     </div>
@@ -87,7 +91,8 @@
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="jumlah" class="form-label">Jumlah</label>
-                        <input type="number" id="jumlah" name="jumlah" class="form-control" step="0.01" required>
+                        <input type="number" id="jumlah" name="jumlah" class="form-control" step="0.01" required
+                            value="{{ old('jumlah') }}">
                     </div>
                 </div>
                 <!-- Field Gambar -->

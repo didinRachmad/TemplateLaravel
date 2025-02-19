@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\ApprovalRouteController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +37,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::prefix('users')->middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::get('/', [UserManagementController::class, 'index'])->name('users.index')->middleware('menu.permission:index');
+    Route::get('/create', [UserManagementController::class, 'create'])->name('users.create')->middleware('menu.permission:create');
+    Route::post('/store', [UserManagementController::class, 'store'])->name('users.store')->middleware('menu.permission:store');
+    Route::get('/edit/{user}', [UserManagementController::class, 'edit'])->name('users.edit')->middleware('menu.permission:edit');
+    Route::put('/update/{user}', [UserManagementController::class, 'update'])->name('users.update')->middleware('menu.permission:update');
+    Route::delete('/destroy/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy')->middleware('menu.permission:destroy');
+    Route::post('/reset-password/{user}', [UserManagementController::class, 'resetPassword'])->name('users.reset-password')->middleware('menu.permission:update');
 });
 
 Route::prefix('roles')->middleware('auth')->group(function () {

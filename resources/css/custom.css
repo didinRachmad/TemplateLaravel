@@ -3,19 +3,19 @@ body,
 .form-select,
 .form-control,
 .select2-container--bootstrap-5 .select2-selection {
-    font-size: 0.85rem !important;
+    font-size: 0.95rem !important;
 }
 
 :root {
-    --bs-body-font-size: 0.85rem !important;
+    --bs-body-font-size: 0.95rem !important;
 }
 
 .btn {
-    --bs-btn-font-size: 0.85rem !important;
+    --bs-btn-font-size: 0.95rem !important;
 }
 
 .pagination {
-    --bs-pagination-font-size: 0.85rem !important;
+    --bs-pagination-font-size: 0.95rem !important;
 }
 
 

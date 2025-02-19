@@ -46,7 +46,7 @@ class RoleController extends Controller
             DB::rollBack();
             Log::error('Error saat membuat role: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat membuat role. Silakan coba lagi.');
-            return redirect()->route('roles.index');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -77,7 +77,7 @@ class RoleController extends Controller
             DB::rollBack();
             Log::error('Error saat memperbarui role: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat memperbarui role. Silakan coba lagi.');
-            return redirect()->route('roles.index');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -96,7 +96,7 @@ class RoleController extends Controller
             DB::rollBack();
             Log::error('Error saat menghapus role: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat menghapus role. Silakan coba lagi.');
-            return redirect()->route('roles.index');
+            return redirect()->back()->withInput();
         }
     }
 

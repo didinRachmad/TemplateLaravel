@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Menu;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -87,12 +88,57 @@ class ItemController extends Controller
             ->first();
 
         if ($nextApprovalRoute) {
-            $item->status = "Approved by {$role->name}. Pending approval for {$nextApprovalRoute->role->name}";
+            $item->status = "menunggu approval dari {$nextApprovalRoute->role->name}";
         } else {
             $item->status = "Final approved";
         }
 
         $item->save();
+
+        // Kirim notifikasi ke seluruh user yang bertugas di tahap berikutnya (jika ada)
+        if ($nextApprovalRoute) {
+            if ($nextApprovalRoute->assigned_user_id) {
+                $approvalUsers = User::where('id', $nextApprovalRoute->assigned_user_id)->get();
+            } else {
+                $approvalUsers = Role::find($nextApprovalRoute->role_id)->users;
+            }
+
+            if ($approvalUsers->count() > 0) {
+                $waService = new WhatsAppNotificationService();
+
+                foreach ($approvalUsers as $approvalUser) {
+                    if ($approvalUser->contact) {
+                        $parameters = [
+                            "body" => [
+                                [
+                                    "key"        => "1",
+                                    "value"      => "nama_aplikasi",
+                                    "value_text" => "Pendataan Item Motasa"
+                                ],
+                                [
+                                    "key"        => "2",
+                                    "value"      => "yth",
+                                    "value_text" => "Kepada yth. " . $approvalUser->name
+                                ],
+                                [
+                                    "key"        => "3",
+                                    "value"      => "konten",
+                                    "value_text" => "Terdapat permintaan persetujuan pada sistem pendataan barang MOI. Silakan akses alamat berikut untuk menyetujui: " . url('/')
+                                ],
+                            ]
+                        ];
+
+                        $waService->sendMessage(
+                            $approvalUser->name,
+                            $approvalUser->contact,
+                            "7c8de24b-bc38-4dc7-b0dd-1e1ae693b653", // Template ID
+                            "0e407445-9744-49b6-a648-0801dea7f33a", // Channel Integration ID
+                            $parameters
+                        );
+                    }
+                }
+            }
+        }
 
         session()->flash('success', 'Item berhasil di-approve.');
         return redirect()->route('items.index');
@@ -139,6 +185,59 @@ class ItemController extends Controller
             ]);
 
             DB::commit();
+
+            // Setelah item disimpan, ambil konfigurasi approval untuk tahap pertama (sequence = 1)
+            $approvalRoute = ApprovalRoute::where('module', 'items')
+                ->where('sequence', 1)
+                ->first();
+
+            if ($approvalRoute) {
+                // Ambil semua user yang memiliki role sesuai konfigurasi atau sesuai assigned_user_id
+                if ($approvalRoute->assigned_user_id) {
+                    $approvalUsers = User::where('id', $approvalRoute->assigned_user_id)->get();
+                } else {
+                    // Ambil semua user yang memiliki role terkait
+                    $approvalUsers = Role::find($approvalRoute->role_id)->users;
+                }
+
+                if ($approvalUsers->count() > 0) {
+                    $waService = new WhatsAppNotificationService();
+                    // Kirim notifikasi ke setiap user yang terlibat
+                    foreach ($approvalUsers as $approvalUser) {
+                        if ($approvalUser->contact) { // gunakan kolom 'contact'
+                            // Siapkan parameter pesan
+                            $parameters = [
+                                "body" => [
+                                    [
+                                        "key"        => "1",
+                                        "value"      => "nama_aplikasi",
+                                        "value_text" => "Pendataan Item Motasa"
+                                    ],
+                                    [
+                                        "key"        => "2",
+                                        "value"      => "yth",
+                                        "value_text" => "Kepada yth. " . $approvalUser->name
+                                    ],
+                                    [
+                                        "key"        => "3",
+                                        "value"      => "konten",
+                                        "value_text" => "Terdapat permintaan persetujuan pada sistem pendataan barang MOI. Silakan akses alamat berikut untuk menyetujui: " . url('/')
+                                    ],
+                                ]
+                            ];
+
+                            $waService->sendMessage(
+                                $approvalUser->name,
+                                $approvalUser->contact,
+                                "7c8de24b-bc38-4dc7-b0dd-1e1ae693b653", // Template ID
+                                "0e407445-9744-49b6-a648-0801dea7f33a", // Channel Integration ID
+                                $parameters
+                            );
+                        }
+                    }
+                }
+            }
+
             session()->flash('success', 'Data berhasil ditambahkan.');
             return redirect()->route('items.index');
         } catch (\Exception $e) {
@@ -146,7 +245,7 @@ class ItemController extends Controller
             Log::error('Error saat menambahkan item: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat menambahkan data. Silakan coba lagi.');
             // session()->flash('error', $e->getMessage());
-            return redirect()->route('items.index');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -198,7 +297,7 @@ class ItemController extends Controller
             DB::rollBack();
             Log::error('Error saat memperbarui item: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.');
-            return redirect()->route('items.index');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -218,7 +317,7 @@ class ItemController extends Controller
             DB::rollBack();
             Log::error('Error saat menghapus item: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.');
-            return redirect()->route('items.index');
+            return redirect()->back()->withInput();
         }
     }
 }

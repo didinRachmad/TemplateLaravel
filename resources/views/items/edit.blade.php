@@ -19,11 +19,14 @@
                     <div class="form-group">
                         <label for="produksi" class="form-label">Produksi</label>
                         <select id="produksi" name="produksi" class="form-select" style="width: 100%;" required>
-                            <option value="P1" {{ $item->produksi == 'P1' ? 'selected' : '' }}>P1</option>
-                            <option value="P2" {{ $item->produksi == 'P2' ? 'selected' : '' }}>P2</option>
+                            <option value="P1" {{ old('produksi', $item->produksi) == 'P1' ? 'selected' : '' }}>P1
+                            </option>
+                            <option value="P2" {{ old('produksi', $item->produksi) == 'P2' ? 'selected' : '' }}>P2
+                            </option>
                         </select>
                     </div>
                 </div>
+
                 <!-- Field Item -->
                 <div class="mb-3">
                     <div class="row">
@@ -31,8 +34,8 @@
                             <div class="form-group">
                                 <label for="kode_item" class="form-label">Kode Item</label>
                                 <select id="kode_item" name="kode_item" class="form-control" required>
-                                    <option value="{{ $item->kode_item }}" selected>{{ $item->kode_item }}
-                                    </option>
+                                    <option value="{{ old('kode_item', $item->kode_item) }}" selected>
+                                        {{ old('kode_item', $item->kode_item) }}</option>
                                 </select>
                             </div>
                         </div>
@@ -40,31 +43,38 @@
                             <div class="form-group">
                                 <label for="nama_item" class="form-label">Nama Item</label>
                                 <input type="text" id="nama_item" name="nama_item" class="form-control bg-light"
-                                    value="{{ $item->nama_item }}" readonly>
+                                    value="{{ old('nama_item', $item->nama_item) }}" readonly>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- Field Jenis -->
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="jenis" class="form-label">Jenis</label>
                         <select id="jenis" name="jenis" class="form-select" style="width: 100%;" required>
-                            <option value="Baru" {{ $item->jenis == 'Baru' ? 'selected' : '' }}>Baru</option>
-                            <option value="Bekas" {{ $item->jenis == 'Bekas' ? 'selected' : '' }}>Bekas</option>
+                            <option value="Baru" {{ old('jenis', $item->jenis) == 'Baru' ? 'selected' : '' }}>Baru
+                            </option>
+                            <option value="Bekas" {{ old('jenis', $item->jenis) == 'Bekas' ? 'selected' : '' }}>Bekas
+                            </option>
                         </select>
                     </div>
                 </div>
+
                 <!-- Field Kondisi -->
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="kondisi" class="form-label">Kondisi</label>
                         <select id="kondisi" name="kondisi" class="form-select" style="width: 100%;" required>
-                            <option value="Baik" {{ $item->kondisi == 'Baik' ? 'selected' : '' }}>Baik</option>
-                            <option value="Rusak" {{ $item->kondisi == 'Rusak' ? 'selected' : '' }}>Rusak</option>
+                            <option value="Baik" {{ old('kondisi', $item->kondisi) == 'Baik' ? 'selected' : '' }}>Baik
+                            </option>
+                            <option value="Rusak" {{ old('kondisi', $item->kondisi) == 'Rusak' ? 'selected' : '' }}>Rusak
+                            </option>
                         </select>
                     </div>
                 </div>
+
                 <!-- Field Lokasi -->
                 <div class="mb-3">
                     <div class="row">
@@ -72,8 +82,8 @@
                             <div class="form-group">
                                 <label for="kode_lokasi" class="form-label">Kode Lokasi</label>
                                 <select id="kode_lokasi" name="kode_lokasi" class="form-control" required>
-                                    <option value="{{ $item->kode_lokasi }}" selected>{{ $item->kode_lokasi }}
-                                    </option>
+                                    <option value="{{ old('kode_lokasi', $item->kode_lokasi) }}" selected>
+                                        {{ old('kode_lokasi', $item->kode_lokasi) }}</option>
                                 </select>
                             </div>
                         </div>
@@ -81,19 +91,21 @@
                             <div class="form-group">
                                 <label for="nama_lokasi" class="form-label">Nama Lokasi</label>
                                 <input type="text" id="nama_lokasi" name="nama_lokasi" class="form-control bg-light"
-                                    value="{{ $item->nama_lokasi }}" readonly>
+                                    value="{{ old('nama_lokasi', $item->nama_lokasi) }}" readonly>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- Field Jumlah -->
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="jumlah" class="form-label">Jumlah</label>
                         <input type="number" id="jumlah" name="jumlah" class="form-control" step="0.01"
-                            value="{{ $item->jumlah }}" required>
+                            value="{{ old('jumlah', $item->jumlah) }}" required>
                     </div>
                 </div>
+
                 <!-- Field Gambar -->
                 <div class="mb-3">
                     <div class="form-group">
@@ -102,7 +114,7 @@
                             capture="environment">
                         @if ($item->gambar)
                             <a href="{{ asset('storage/' . $item->gambar) }}" data-fancybox="gallery"
-                                data-caption="Gambar {{ $item->nama_item }}">
+                                data-caption="Gambar {{ old('nama_item', $item->nama_item) }}">
                                 <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Item"
                                     class="img-thumbnail mt-2" width="150">
                             </a>

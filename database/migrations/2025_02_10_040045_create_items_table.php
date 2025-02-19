@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('approval_level')->default(0);
             $table->string('status')->default('Pending');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

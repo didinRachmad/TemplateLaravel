@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('icon')->nullable();  // Icon (opsional)
             $table->integer('order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

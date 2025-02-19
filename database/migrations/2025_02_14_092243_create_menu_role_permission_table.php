@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('permission_id');
             $table->timestamps();
+            $table->softDeletes();
 
             // Relasi foreign key (sesuaikan nama tabel jika berbeda)
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');

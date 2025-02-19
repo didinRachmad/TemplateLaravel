@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('sequence'); // urutan approval
             $table->unsignedBigInteger('assigned_user_id')->nullable(); // jika ingin meng-assign user tertentu
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('assigned_user_id')->references('id')->on('users')->onDelete('set null');

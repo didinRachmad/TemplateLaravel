@@ -17,28 +17,32 @@
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="title" class="form-label">Title</label>
-                        <input type="text" id="title" name="title" class="form-control" required>
+                        <input type="text" id="title" name="title" class="form-control" value="{{ old('title') }}"
+                            required>
                     </div>
                 </div>
                 <!-- Field Route -->
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="route" class="form-label">Route</label>
-                        <input type="text" id="route" name="route" class="form-control" required>
+                        <input type="text" id="route" name="route" class="form-control" value="{{ old('route') }}"
+                            required>
                     </div>
                 </div>
                 <!-- Field Icon -->
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="icon" class="form-label">Icon</label>
-                        <input type="text" id="icon" name="icon" class="form-control">
+                        <input type="text" id="icon" name="icon" class="form-control"
+                            value="{{ old('icon') }}">
                     </div>
                 </div>
                 <!-- Field Order -->
                 <div class="mb-3">
                     <div class="form-group">
                         <label for="order" class="form-label">Order</label>
-                        <input type="text" id="order" name="order" class="form-control" required>
+                        <input type="text" id="order" name="order" class="form-control" value="{{ old('order') }}"
+                            required>
                     </div>
                 </div>
             </div>

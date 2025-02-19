@@ -29,40 +29,6 @@ class MenuController extends Controller
 
     public function show($id) {}
 
-    public function approve($id, Request $request)
-    {
-        // Ambil konfigurasi approval untuk module 'Menu'
-        $approvalRoutes = ApprovalRoute::where('module', 'Menu')
-            ->orderBy('sequence')
-            ->get();
-
-        // Tentukan role dan approval step user saat ini
-        $currentRole = auth()->user()->getRoleNames()->first();
-        $currentApproval = $approvalRoutes->firstWhere('role_id', function ($roleId) use ($currentRole) {
-            return $roleId == \App\Models\Role::where('name', $currentRole)->first()->id;
-        });
-
-        $expectedSequence = $currentApproval ? $currentApproval->sequence : null;
-
-        if (is_null($expectedSequence)) {
-            abort(403, 'Anda tidak memiliki hak untuk approve menus.');
-        }
-
-        $menu = Menu::findOrFail($id);
-
-        // Cek apakah menu dalam status pending untuk user ini
-        if ($menu->approval_level !== $expectedSequence - 1) {
-            abort(403, 'Menu tidak dalam status pending untuk approval Anda.');
-        }
-
-        // Update approval_level sesuai dengan sequence approval user saat ini
-        $menu->approval_level = $expectedSequence;
-        $menu->save();
-
-        session()->flash('success', 'Menu berhasil di-approve.');
-        return redirect()->route('menus.approval');
-    }
-
     public function create()
     {
         return view('menus.create');
@@ -95,7 +61,7 @@ class MenuController extends Controller
             DB::rollBack();
             Log::error('Error saat menambahkan menu: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat menambahkan data. Silakan coba lagi.');
-            return redirect()->route('menus.index');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -130,7 +96,7 @@ class MenuController extends Controller
             DB::rollBack();
             Log::error('Error saat memperbarui menu: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.');
-            return redirect()->route('menus.index');
+            return redirect()->back()->withInput();
         }
     }
 
@@ -147,7 +113,7 @@ class MenuController extends Controller
             DB::rollBack();
             Log::error('Error saat menghapus menu: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.');
-            return redirect()->route('menus.index');
+            return redirect()->back()->withInput();
         }
     }
 }

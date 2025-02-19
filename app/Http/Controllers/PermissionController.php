@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use App\Models\Permission;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PermissionController extends Controller
 {
@@ -31,11 +30,19 @@ class PermissionController extends Controller
             'name' => 'required|unique:permissions,name',
         ]);
 
-        Permission::create([
-            'name' => $request->name,
-        ]);
-
-        return redirect()->route('permissions.index')->with('success', 'Permission berhasil dibuat.');
+        DB::beginTransaction();
+        try {
+            Permission::create([
+                'name' => $request->name,
+            ]);
+            DB::commit();
+            session()->flash('success', 'Data permission berhasil dibuat.');
+            return redirect()->route('permissions.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat menyimpan data.');
+            return redirect()->back()->withInput();
+        }
     }
 
     // Menampilkan form untuk mengedit permission
@@ -51,17 +58,34 @@ class PermissionController extends Controller
             'name' => 'required|unique:permissions,name,' . $permission->id,
         ]);
 
-        $permission->update([
-            'name' => $request->name,
-        ]);
-
-        return redirect()->route('permissions.index')->with('success', 'Permission berhasil diperbarui.');
+        DB::beginTransaction();
+        try {
+            $permission->update([
+                'name' => $request->name,
+            ]);
+            DB::commit();
+            session()->flash('success', 'Data permission berhasil diperbarui.');
+            return redirect()->route('permissions.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat memperbarui data.');
+            return redirect()->back()->withInput();
+        }
     }
 
     // Menghapus permission
     public function destroy(Permission $permission)
     {
-        $permission->delete();
-        return redirect()->route('permissions.index')->with('success', 'Permission berhasil dihapus.');
+        DB::beginTransaction();
+        try {
+            $permission->delete();
+            DB::commit();
+            session()->flash('success', 'Data permission berhasil dihapus.');
+            return redirect()->route('permissions.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat menghapus data.');
+            return redirect()->back();
+        }
     }
 }

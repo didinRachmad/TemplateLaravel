@@ -20,6 +20,10 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
+        if (!auth()->check() || auth()->user()->role !== 'super_admin') {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('auth.register');
     }
 

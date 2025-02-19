@@ -33,8 +33,6 @@ class MenuPermissionMiddleware
             abort(403, 'Menu tidak ditemukan.');
         }
 
-        Log::info($permission);
-
         // Cek apakah pengguna memiliki izin untuk menu ini
         if (!Auth::user()->hasMenuPermission($menu->id, $permission)) {
             abort(403, 'Anda tidak memiliki akses untuk tindakan ini.');

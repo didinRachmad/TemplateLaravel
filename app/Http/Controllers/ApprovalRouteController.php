@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ApprovalRoute;
 use App\Models\Menu;
 use App\Models\Role;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApprovalRouteController extends Controller
 {
@@ -16,7 +16,6 @@ class ApprovalRouteController extends Controller
     public function index()
     {
         $menu = Menu::where('route', 'approval_routes')->first();
-
         $routes = ApprovalRoute::orderBy('module')->orderBy('sequence')->get();
         return view('approval_routes.index', compact('routes', 'menu'));
     }
@@ -26,7 +25,6 @@ class ApprovalRouteController extends Controller
      */
     public function create()
     {
-        // Ambil daftar role dan user untuk select box (pastikan model Role dan User sudah ada)
         $menus = Menu::orderBy('order')->get();
         $roles = Role::all();
         $users = auth()->user()->all();
@@ -43,18 +41,19 @@ class ApprovalRouteController extends Controller
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
 
-        ApprovalRoute::create($validated);
+        try {
+            DB::beginTransaction();
 
-        session()->flash('success', 'Konfigurasi approval berhasil ditambahkan.');
-        return redirect()->route('approval_routes.index');
-    }
+            ApprovalRoute::create($validated);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+            DB::commit();
+            session()->flash('success', 'Konfigurasi approval berhasil ditambahkan.');
+            return redirect()->route('approval_routes.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+            return redirect()->back()->withInput();
+        }
     }
 
     /**
@@ -80,10 +79,19 @@ class ApprovalRouteController extends Controller
             'assigned_user_id' => 'nullable|exists:users,id',
         ]);
 
-        $route->update($validated);
+        try {
+            DB::beginTransaction();
 
-        session()->flash('success', 'Konfigurasi approval berhasil diperbarui.');
-        return redirect()->route('approval_routes.index');
+            $route->update($validated);
+
+            DB::commit();
+            session()->flash('success', 'Konfigurasi approval berhasil diperbarui.');
+            return redirect()->route('approval_routes.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+            return redirect()->back()->withInput();
+        }
     }
 
     /**
@@ -92,9 +100,19 @@ class ApprovalRouteController extends Controller
     public function destroy($id)
     {
         $route = ApprovalRoute::findOrFail($id);
-        $route->delete();
 
-        session()->flash('success', 'Konfigurasi approval berhasil dihapus.');
-        return redirect()->route('approval_routes.index');
+        try {
+            DB::beginTransaction();
+
+            $route->delete();
+
+            DB::commit();
+            session()->flash('success', 'Konfigurasi approval berhasil dihapus.');
+            return redirect()->route('approval_routes.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage());
+            return redirect()->back();
+        }
     }
 }

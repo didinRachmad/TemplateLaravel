@@ -14,7 +14,7 @@
                 <h5 class="card-title mb-0">Edit Data</h5>
             </div>
             <div class="card-body">
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="name">Nama Permission</label>
                     <input type="text" id="name" name="name" class="form-control" value="{{ $permission->name }}"
                         required>

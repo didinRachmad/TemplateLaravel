@@ -20,7 +20,7 @@ Fancybox.bind('[data-fancybox]');
 import moment from 'moment';
 import 'moment-timezone';
 
-import { showAlert, showToast, showConfirmDialog } from './alerts.js';
+import { showAlert, showToast, showConfirmDialog } from './components/alerts.js';
 
 window.$ = $;
 window.jQuery = $;
@@ -89,10 +89,18 @@ document.addEventListener('click', function (e) {
         );
     } else if (e.target.closest('.btn-approve')) {
         e.preventDefault();
-        const form = this.closest('.form-approval');
+        const form = e.target.closest('.form-approval');
         showConfirmDialog(
             "Apakah Anda yakin?",
             "Harap periksa kembali sebelum melakukan approve data!",
+            () => form.submit()
+        );
+    } else if (e.target.closest('.btn-reset-password')) {
+        e.preventDefault();
+        const form = e.target.closest('.form-reset-password');
+        showConfirmDialog(
+            "Apakah Anda yakin?",
+            "Password akan direset ke data awal!",
             () => form.submit()
         );
     }

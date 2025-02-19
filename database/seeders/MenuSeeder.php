@@ -55,6 +55,14 @@ class MenuSeeder extends Seeder
                 'created_at'  => Carbon::now(),
                 'updated_at'  => Carbon::now(),
             ],
+            [
+                'title'       => 'Users',
+                'route'       => 'users',
+                'icon'        => '',
+                'order'       => 6,
+                'created_at'  => Carbon::now(),
+                'updated_at'  => Carbon::now(),
+            ],
         ];
 
         Menu::insert($menus);

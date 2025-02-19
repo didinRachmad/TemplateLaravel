@@ -56,6 +56,8 @@
                         <td>
                             @if ($approvalRoute && $item->approval_level >= $approvalRoute->sequence)
                                 Approved
+                            @else
+                                {{ $item->status }}
                             @endif
                         </td>
                         <td class="text-center">
@@ -70,7 +72,7 @@
                                     <form action="{{ route('items.approve', $item->id) }}" method="POST"
                                         class="form-approval">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-success btn-approve">
+                                        <button type="button" class="btn btn-sm btn-outline-success btn-approve">
                                             <i class="bi bi-check2-square"></i> Approve
                                         </button>
                                     </form>
