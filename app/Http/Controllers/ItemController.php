@@ -52,98 +52,6 @@ class ItemController extends Controller
         return view('items.show', compact('item', 'approvalRoute'));
     }
 
-    public function approve($id, Request $request)
-    {
-        // Ambil data menu 'items'
-        $menu = Menu::where('route', 'items')->first();
-
-        // Ambil role user saat ini
-        $currentRoleName = auth()->user()->getRoleNames()->first();
-        $role = \Spatie\Permission\Models\Role::where('name', $currentRoleName)->first();
-
-        // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
-        $approvalRoute = ApprovalRoute::where('module', 'items')
-            ->where('role_id', $role->id)
-            ->first();
-
-        if (!$approvalRoute) {
-            abort(403, 'Anda tidak memiliki hak untuk melakukan approval.');
-        }
-
-        // Ambil item yang akan di-approve
-        $item = Item::findOrFail($id);
-
-        // Pastikan item dalam status pending untuk approval user ini:
-        if ($item->approval_level !== ($approvalRoute->sequence - 1)) {
-            abort(403, 'Item tidak dalam status pending untuk approval Anda.');
-        }
-
-        // Update approval_level menjadi nilai konfigurasi (misal, jika sequence = 1, maka item approval_level menjadi 1)
-        $item->approval_level = $approvalRoute->sequence;
-
-        // Update status: jika ada konfigurasi approval berikutnya, tampilkan keterangan pending untuk role berikutnya
-        $nextApprovalRoute = ApprovalRoute::where('module', 'items')
-            ->where('sequence', '>', $approvalRoute->sequence)
-            ->orderBy('sequence', 'asc')
-            ->first();
-
-        if ($nextApprovalRoute) {
-            $item->status = "menunggu approval dari {$nextApprovalRoute->role->name}";
-        } else {
-            $item->status = "Final approved";
-        }
-
-        $item->save();
-
-        // Kirim notifikasi ke seluruh user yang bertugas di tahap berikutnya (jika ada)
-        if ($nextApprovalRoute) {
-            if ($nextApprovalRoute->assigned_user_id) {
-                $approvalUsers = User::where('id', $nextApprovalRoute->assigned_user_id)->get();
-            } else {
-                $approvalUsers = Role::find($nextApprovalRoute->role_id)->users;
-            }
-
-            if ($approvalUsers->count() > 0) {
-                $waService = new WhatsAppNotificationService();
-
-                foreach ($approvalUsers as $approvalUser) {
-                    if ($approvalUser->contact) {
-                        $parameters = [
-                            "body" => [
-                                [
-                                    "key"        => "1",
-                                    "value"      => "nama_aplikasi",
-                                    "value_text" => "Pendataan Item Motasa"
-                                ],
-                                [
-                                    "key"        => "2",
-                                    "value"      => "yth",
-                                    "value_text" => "Kepada yth. " . $approvalUser->name
-                                ],
-                                [
-                                    "key"        => "3",
-                                    "value"      => "konten",
-                                    "value_text" => "Terdapat permintaan persetujuan pada sistem pendataan barang MOI. Silakan akses alamat berikut untuk menyetujui: " . url('/')
-                                ],
-                            ]
-                        ];
-
-                        $waService->sendMessage(
-                            $approvalUser->name,
-                            $approvalUser->contact,
-                            "7c8de24b-bc38-4dc7-b0dd-1e1ae693b653", // Template ID
-                            "0e407445-9744-49b6-a648-0801dea7f33a", // Channel Integration ID
-                            $parameters
-                        );
-                    }
-                }
-            }
-        }
-
-        session()->flash('success', 'Item berhasil di-approve.');
-        return redirect()->route('items.index');
-    }
-
     public function create()
     {
         return view('items.create');
@@ -172,7 +80,8 @@ class ItemController extends Controller
                 $gambarPath = $request->file('gambar')->store('uploads', 'public');
             }
 
-            Item::create([
+            // Simpan item baru
+            $item = Item::create([
                 'produksi' => $validatedData['produksi'],
                 'kode_item' => $validatedData['kode_item'],
                 'nama_item' => $validatedData['nama_item'],
@@ -181,31 +90,33 @@ class ItemController extends Controller
                 'kode_lokasi' => $validatedData['kode_lokasi'],
                 'nama_lokasi' => $validatedData['nama_lokasi'],
                 'jumlah' => $validatedData['jumlah'],
-                'gambar' => $gambarPath,
+                'gambar' => $gambarPath ?? null,
             ]);
 
             DB::commit();
 
-            // Setelah item disimpan, ambil konfigurasi approval untuk tahap pertama (sequence = 1)
+            // Cek approval tahap pertama (sequence = 1)
             $approvalRoute = ApprovalRoute::where('module', 'items')
                 ->where('sequence', 1)
                 ->first();
 
             if ($approvalRoute) {
-                // Ambil semua user yang memiliki role sesuai konfigurasi atau sesuai assigned_user_id
-                if ($approvalRoute->assigned_user_id) {
-                    $approvalUsers = User::where('id', $approvalRoute->assigned_user_id)->get();
-                } else {
-                    // Ambil semua user yang memiliki role terkait
-                    $approvalUsers = Role::find($approvalRoute->role_id)->users;
-                }
+                // Set status "Menunggu approval dari {role_name}"
+                $item->update([
+                    'status' => "Menunggu approval dari {$approvalRoute->role->name}"
+                ]);
+
+                // Ambil user yang harus melakukan approval
+                $approvalUsers = $approvalRoute->assigned_user_id
+                    ? User::where('id', $approvalRoute->assigned_user_id)->get()
+                    : Role::find($approvalRoute->role_id)->users;
 
                 if ($approvalUsers->count() > 0) {
                     $waService = new WhatsAppNotificationService();
+
                     // Kirim notifikasi ke setiap user yang terlibat
                     foreach ($approvalUsers as $approvalUser) {
-                        if ($approvalUser->contact) { // gunakan kolom 'contact'
-                            // Siapkan parameter pesan
+                        if ($approvalUser->contact) {
                             $parameters = [
                                 "body" => [
                                     [
@@ -236,6 +147,11 @@ class ItemController extends Controller
                         }
                     }
                 }
+            } else {
+                // Jika tidak ada approval tahap berikutnya, status bisa ditentukan sesuai kebutuhan
+                $item->update([
+                    'status' => "Tidak memerlukan approval"
+                ]);
             }
 
             session()->flash('success', 'Data berhasil ditambahkan.');
@@ -244,7 +160,6 @@ class ItemController extends Controller
             DB::rollBack();
             Log::error('Error saat menambahkan item: ' . $e->getMessage());
             session()->flash('error', 'Terjadi kesalahan saat menambahkan data. Silakan coba lagi.');
-            // session()->flash('error', $e->getMessage());
             return redirect()->back()->withInput();
         }
     }
@@ -319,5 +234,97 @@ class ItemController extends Controller
             session()->flash('error', 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.');
             return redirect()->back()->withInput();
         }
+    }
+
+    public function approve($id, Request $request)
+    {
+        // Ambil data menu 'items'
+        $menu = Menu::where('route', 'items')->first();
+
+        // Ambil role user saat ini
+        $currentRoleName = auth()->user()->getRoleNames()->first();
+        $role = \Spatie\Permission\Models\Role::where('name', $currentRoleName)->first();
+
+        // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
+        $approvalRoute = ApprovalRoute::where('module', 'items')
+            ->where('role_id', $role->id)
+            ->first();
+
+        if (!$approvalRoute) {
+            abort(403, 'Anda tidak memiliki hak untuk melakukan approval.');
+        }
+
+        // Ambil item yang akan di-approve
+        $item = Item::findOrFail($id);
+
+        // Pastikan item dalam status pending untuk approval user ini:
+        if ($item->approval_level !== ($approvalRoute->sequence - 1)) {
+            abort(403, 'Item tidak dalam status pending untuk approval Anda.');
+        }
+
+        // Update approval_level menjadi nilai konfigurasi (misal, jika sequence = 1, maka item approval_level menjadi 1)
+        $item->approval_level = $approvalRoute->sequence;
+
+        // Update status: jika ada konfigurasi approval berikutnya, tampilkan keterangan pending untuk role berikutnya
+        $nextApprovalRoute = ApprovalRoute::where('module', 'items')
+            ->where('sequence', '>', $approvalRoute->sequence)
+            ->orderBy('sequence', 'asc')
+            ->first();
+
+        if ($nextApprovalRoute) {
+            $item->status = "Menunggu approval dari {$nextApprovalRoute->role->name}";
+        } else {
+            $item->status = "Final approved";
+        }
+
+        $item->save();
+
+        // Kirim notifikasi ke seluruh user yang bertugas di tahap berikutnya (jika ada)
+        if ($nextApprovalRoute) {
+            if ($nextApprovalRoute->assigned_user_id) {
+                $approvalUsers = User::where('id', $nextApprovalRoute->assigned_user_id)->get();
+            } else {
+                $approvalUsers = Role::find($nextApprovalRoute->role_id)->users;
+            }
+
+            if ($approvalUsers->count() > 0) {
+                $waService = new WhatsAppNotificationService();
+
+                foreach ($approvalUsers as $approvalUser) {
+                    if ($approvalUser->contact) {
+                        $parameters = [
+                            "body" => [
+                                [
+                                    "key"        => "1",
+                                    "value"      => "nama_aplikasi",
+                                    "value_text" => "Pendataan Item Motasa"
+                                ],
+                                [
+                                    "key"        => "2",
+                                    "value"      => "yth",
+                                    "value_text" => "Kepada yth. " . $approvalUser->name
+                                ],
+                                [
+                                    "key"        => "3",
+                                    "value"      => "konten",
+                                    "value_text" => "Terdapat permintaan persetujuan pada sistem pendataan barang MOI. Silakan akses alamat berikut untuk menyetujui: " . url('/')
+                                ],
+                            ]
+                        ];
+
+                        $waService->sendMessage(
+                            $approvalUser->name,
+                            $approvalUser->contact,
+                            "7c8de24b-bc38-4dc7-b0dd-1e1ae693b653", // Template ID
+                            "0e407445-9744-49b6-a648-0801dea7f33a", // Channel Integration ID
+                            $parameters
+                        );
+                    }
+                }
+            }
+        }
+
+        session()->flash('success', 'Item berhasil di-approve.');
+        return redirect()->route('items.index');
     }
 }
