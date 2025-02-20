@@ -32,7 +32,7 @@
                 <div class="form-group mb-3">
                     <label for="produksi" class="form-label">Produksi</label>
                     <select id="produksi" name="produksi" class="form-select" style="width: 100%;">
-                        <option value="" disabled {{ old('produksi', $user->produksi) == '' ? 'selected' : '' }}>Pilih
+                        <option value="" {{ old('produksi', $user->produksi) == '' ? 'selected' : '' }}>Pilih
                             Produksi</option>
                         <option value="P1" {{ old('produksi', $user->produksi) == 'P1' ? 'selected' : '' }}>P1</option>
                         <option value="P2" {{ old('produksi', $user->produksi) == 'P2' ? 'selected' : '' }}>P2</option>

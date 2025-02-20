@@ -28,7 +28,7 @@
                 <div class="form-group mb-3">
                     <label for="produksi" class="form-label">Produksi</label>
                     <select id="produksi" name="produksi" class="form-select" style="width: 100%;">
-                        <option value="" selected disabled>Pilih Produksi</option>
+                        <option value="" selected>Pilih Produksi</option>
                         <option value="P1" {{ old('produksi') == 'P1' ? 'selected' : '' }}>P1</option>
                         <option value="P2" {{ old('produksi') == 'P2' ? 'selected' : '' }}>P2</option>
                     </select>
