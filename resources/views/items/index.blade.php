@@ -62,37 +62,72 @@
                         </td>
                         <td class="text-center">
                             <div class="btn-group" role="group">
+                                <!-- Tombol View -->
                                 @if (auth()->user()->hasMenuPermission($menu->id, 'show'))
                                     <a href="{{ route('items.show', $item->id) }}" class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye-fill"></i> View
                                     </a>
                                 @endif
 
+                                <!-- Tombol Approve -->
                                 @if ($approvalRoute && $item->approval_level == $approvalRoute->sequence - 1)
-                                    <form action="{{ route('items.approve', $item->id) }}" method="POST"
-                                        class="form-approval">
-                                        @csrf
-                                        <button type="button" class="btn btn-sm btn-outline-success btn-approve">
-                                            <i class="bi bi-check2-square"></i> Approve
+                                    <!-- Dropdown Action untuk Approve, Reject, dan Revise -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                            id="actionDropdown{{ $item->id }}" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            Action
                                         </button>
-                                    </form>
+                                        <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $item->id }}">
+                                            <li>
+                                                <form action="{{ route('items.approve', $item->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item">Approve</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('items.reject', $item->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item">Reject</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('items.revise', $item->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item">Revise</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 @endif
 
-                                @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
-                                    <a href="{{ route('items.edit', $item->id) }}" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-                                @endif
+                                <!-- Tombol Edit dan Hapus hanya muncul jika kondisi terpenuhi -->
+                                @php
+                                    $canModify = !($item->approval_level > 1);
+                                @endphp
 
-                                @if (auth()->user()->hasMenuPermission($menu->id, 'destroy'))
-                                    <form action="{{ route('items.destroy', $item->id) }}" method="POST"
-                                        class="form-delete d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete">
-                                            <i class="bi bi-trash-fill"></i> Hapus
-                                        </button>
-                                    </form>
+                                @if ($canModify)
+                                    @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
+                                        <a href="{{ route('items.edit', $item->id) }}"
+                                            class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                    @endif
+
+                                    @if (auth()->user()->hasMenuPermission($menu->id, 'destroy'))
+                                        <form action="{{ route('items.destroy', $item->id) }}" method="POST"
+                                            class="form-delete d-inline"
+                                            onsubmit="return confirm('Anda yakin ingin menghapus item ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-delete">
+                                                <i class="bi bi-trash-fill"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
                             </div>
                         </td>

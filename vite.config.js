@@ -14,7 +14,7 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks: {
-                    vendor: ['jquery', 'select2', 'bootstrap', 'datatables.net-bs5'],
+                    vendor: ['jquery', 'select2', 'bootstrap', 'datatables.net-bs5', 'sweetalert2'],
                     pdf: ['jspdf', 'jszip', 'pdfmake', 'xlsx'],
                     fancybox: ['@fancyapps/ui'],
                     moment: ['moment', 'moment-timezone'],

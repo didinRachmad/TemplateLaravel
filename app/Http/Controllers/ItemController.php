@@ -116,7 +116,15 @@ class ItemController extends Controller
 
                     // Kirim notifikasi ke setiap user yang terlibat
                     foreach ($approvalUsers as $approvalUser) {
+                        // Filter berdasarkan produksi:
+                        // Jika user memiliki produksi, maka hanya kirim jika sama dengan produksi item.
+                        // Jika produksi null, kirim notifikasi tanpa filter.
                         if ($approvalUser->contact) {
+                            if ($approvalUser->produksi !== null && $approvalUser->produksi !== $item->produksi) {
+                                continue; // Lewati user yang produksinya tidak sesuai
+                            }
+
+                            // Siapkan parameter pesan
                             $parameters = [
                                 "body" => [
                                     [
@@ -291,7 +299,14 @@ class ItemController extends Controller
                 $waService = new WhatsAppNotificationService();
 
                 foreach ($approvalUsers as $approvalUser) {
+                    // Filter berdasarkan produksi:
+                    // Jika user memiliki produksi, maka hanya kirim jika sama dengan produksi item.
+                    // Jika produksi null, kirim notifikasi tanpa filter.
                     if ($approvalUser->contact) {
+                        if ($approvalUser->produksi !== null && $approvalUser->produksi !== $item->produksi) {
+                            continue; // Lewati user yang produksinya tidak sesuai
+                        }
+
                         $parameters = [
                             "body" => [
                                 [

@@ -39,6 +39,12 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
+$(document).ready(function () {
+    setTimeout(() => {
+        $("#loading-screen").fadeOut("slow");
+    }, 200); // Delay 1 detik sebelum loading hilang
+});
+
 // Mendaftarkan semua file JS di folder ini (misalnya, item.js, users.js, posts.js)
 const modules = import.meta.glob('./*.js');
 

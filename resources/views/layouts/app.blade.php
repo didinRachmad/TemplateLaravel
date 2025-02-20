@@ -18,6 +18,13 @@
 </head>
 
 <body class="font-sans antialiased" data-page="{{ $page ?? 'default' }}" data-action="{{ $action ?? 'index' }}">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="wave">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
     <div class="min-h-screen bg-gray-100" style="padding-top: 60px;">
         @include('layouts.navigation')
 
