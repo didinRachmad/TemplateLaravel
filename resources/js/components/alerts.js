@@ -36,3 +36,29 @@ export function showConfirmDialog(title, text, confirmCallback) {
         }
     });
 }
+
+export function showInputDialog(title, text, confirmCallback) {
+    Swal.fire({
+        title: title,
+        html: `<p>${text}</p>
+               <textarea id="inputReason" class="swal2-textarea w-100 m-0" placeholder="Masukkan keterangan..."></textarea>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Kirim',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+            const reason = Swal.getPopup().querySelector('#inputReason').value;
+            if (!reason) {
+                Swal.showValidationMessage('Harap masukkan keterangan!');
+            }
+            return { reason: reason };
+        }
+    }).then((result) => {
+        if (result.isConfirmed && typeof confirmCallback === 'function') {
+            confirmCallback(result.value.reason);
+        }
+    });
+}
+

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('contact')->nullable();
             $table->string('password');
-            $table->string('produksi')->nullable();
+            $table->unsignedBigInteger('produksi_id')->nullable()->change();
+            $table->foreign('produksi_id')->references('id')->on('master_produksi')->nullOnDelete();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

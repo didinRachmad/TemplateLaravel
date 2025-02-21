@@ -125,64 +125,64 @@ export default {
             $('#nama_item').val(data.text); // Perbarui nilai input read-only dengan bnama
         });
 
-        // $('#kode_lokasi').select2({
-        //     theme: 'bootstrap-5',
-        //     ajax: {
-        //         url: 'http://10.252.2.166/api-vms/public/api/master/location/listapi',
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function (params) {
-        //             return {
-        //                 term: params.term,
-        //                 search: {
-        //                     value: params.term
-        //                 }
-        //             };
-        //         },
-        //         processResults: function (data) {
-        //             return {
-        //                 results: $.map(data.data, function (location) {
-        //                     return {
-        //                         id: location.lkode, // Gunakan lkode sebagai id
-        //                         text: location
-        //                             .lnama, // Gunakan lnama sebagai teks yang ditampilkan
-        //                         lnama: location.lnama,
-        //                         lkodetransaksi: location.lkodetransaksi
-        //                     };
-        //                 })
-        //             };
-        //         },
-        //         cache: true
-        //     },
-        //     placeholder: 'Pilih Lokasi',
-        //     minimumInputLength: 1,
-        //     templateResult: function (location) {
-        //         if (location.loading) {
-        //             return location.text;
-        //         }
-        //         var $container = $(
-        //             "<div class='select2-result-location clearfix'>" +
-        //             "<div class='select2-result-location__meta'>" +
-        //             "<div class='select2-result-location__title'></div>" +
-        //             "<div class='select2-result-location__subtitle'></div>" +
-        //             "</div>" +
-        //             "</div>"
-        //         );
-        //         $container.find(".select2-result-location__title").text(location.id +
-        //             ' - ' + location.text);
-        //         $container.find(".select2-result-location__subtitle").text(
-        //             'Kode Transaksi: ' + location.lkodetransaksi);
-        //         return $container;
-        //     },
-        //     templateSelection: function (location) {
-        //         return location.id;
-        //     }
-        // });
-        // // Event handler untuk memperbarui input field read-only
-        // $('#kode_lokasi').on('select2:select', function (e) {
-        //     var data = e.params.data;
-        //     $('#nama_lokasi').val(data.text); // Perbarui nilai input read-only dengan bnama
-        // });
+        $('#kode_lokasi').select2({
+            theme: 'bootstrap-5',
+            ajax: {
+                url: 'http://10.252.2.166/api-vms/public/api/master/location/listapi',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term,
+                        search: {
+                            value: params.term
+                        }
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: $.map(data.data, function (location) {
+                            return {
+                                id: location.lkode, // Gunakan lkode sebagai id
+                                text: location
+                                    .lnama, // Gunakan lnama sebagai teks yang ditampilkan
+                                lnama: location.lnama,
+                                lkodetransaksi: location.lkodetransaksi
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Pilih Lokasi',
+            minimumInputLength: 1,
+            templateResult: function (location) {
+                if (location.loading) {
+                    return location.text;
+                }
+                var $container = $(
+                    "<div class='select2-result-location clearfix'>" +
+                    "<div class='select2-result-location__meta'>" +
+                    "<div class='select2-result-location__title'></div>" +
+                    "<div class='select2-result-location__subtitle'></div>" +
+                    "</div>" +
+                    "</div>"
+                );
+                $container.find(".select2-result-location__title").text(location.id +
+                    ' - ' + location.text);
+                $container.find(".select2-result-location__subtitle").text(
+                    'Kode Transaksi: ' + location.lkodetransaksi);
+                return $container;
+            },
+            templateSelection: function (location) {
+                return location.id;
+            }
+        });
+        // Event handler untuk memperbarui input field read-only
+        $('#kode_lokasi').on('select2:select', function (e) {
+            var data = e.params.data;
+            $('#nama_lokasi').val(data.text); // Perbarui nilai input read-only dengan bnama
+        });
     },
     initEdit() {
         console.log('Halaman Item Edit berhasil dimuat!');

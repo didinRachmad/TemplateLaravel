@@ -63,6 +63,14 @@ class MenuSeeder extends Seeder
                 'created_at'  => Carbon::now(),
                 'updated_at'  => Carbon::now(),
             ],
+            [
+                'title'       => 'Master Produksi',
+                'route'       => 'master_produksi',
+                'icon'        => '',
+                'order'       => 7,
+                'created_at'  => Carbon::now(),
+                'updated_at'  => Carbon::now(),
+            ],
         ];
 
         Menu::insert($menus);

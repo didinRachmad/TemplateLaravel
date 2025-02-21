@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApprovalRouteController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\Master\ProduksiController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
@@ -76,23 +77,35 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 Route::prefix('menus')->middleware('auth')->group(function () {
     Route::get('/', [MenuController::class, 'index'])->name('menus.index')->middleware('menu.permission:index');
-    Route::get('/approve/{id}', [MenuController::class, 'approve'])->name('menus.approve')->middleware('menu.permission:approve');
+    Route::get('/approve/{menu}', [MenuController::class, 'approve'])->name('menus.approve')->middleware('menu.permission:approve');
     Route::get('/create', [MenuController::class, 'create'])->name('menus.create')->middleware('menu.permission:create');
     Route::post('/store', [MenuController::class, 'store'])->name('menus.store')->middleware('menu.permission:store');
-    Route::get('/edit/{id}', [MenuController::class, 'edit'])->name('menus.edit')->middleware('menu.permission:edit');
-    Route::put('/update/{id}', [MenuController::class, 'update'])->name('menus.update')->middleware('menu.permission:update');
-    Route::delete('/destroy/{id}', [MenuController::class, 'destroy'])->name('menus.destroy')->middleware('menu.permission:destroy');
+    Route::get('/edit/{menu}', [MenuController::class, 'edit'])->name('menus.edit')->middleware('menu.permission:edit');
+    Route::put('/update/{menu}', [MenuController::class, 'update'])->name('menus.update')->middleware('menu.permission:update');
+    Route::delete('/destroy/{menu}', [MenuController::class, 'destroy'])->name('menus.destroy')->middleware('menu.permission:destroy');
+});
+
+Route::prefix('master_produksi')->middleware('auth')->group(function () {
+    Route::get('/', [ProduksiController::class, 'index'])->name('master_produksi.index')->middleware('menu.permission:index');
+    Route::get('/create', [ProduksiController::class, 'create'])->name('master_produksi.create')->middleware('menu.permission:create');
+    Route::post('/store', [ProduksiController::class, 'store'])->name('master_produksi.store')->middleware('menu.permission:store');
+    Route::get('/edit/{produksi}', [ProduksiController::class, 'edit'])->name('master_produksi.edit')->middleware('menu.permission:edit');
+    Route::put('/update/{produksi}', [ProduksiController::class, 'update'])->name('master_produksi.update')->middleware('menu.permission:update');
+    Route::delete('/destroy/{produksi}', [ProduksiController::class, 'destroy'])->name('master_produksi.destroy')->middleware('menu.permission:destroy');
 });
 
 Route::prefix('items')->middleware('auth')->group(function () {
     Route::get('/', [ItemController::class, 'index'])->name('items.index')->middleware('menu.permission:index');
-    Route::get('/show/{id}', [ItemController::class, 'show'])->name('items.show')->middleware('menu.permission:show');
-    Route::post('/approve/{id}', [ItemController::class, 'approve'])->name('items.approve')->middleware('menu.permission:approve');
+    Route::get('/show/{item}', [ItemController::class, 'show'])->name('items.show')->middleware('menu.permission:show');
     Route::get('/create', [ItemController::class, 'create'])->name('items.create')->middleware('menu.permission:create');
     Route::post('/store', [ItemController::class, 'store'])->name('items.store')->middleware('menu.permission:store');
-    Route::get('/edit/{id}', [ItemController::class, 'edit'])->name('items.edit')->middleware('menu.permission:edit');
-    Route::put('/update/{id}', [ItemController::class, 'update'])->name('items.update')->middleware('menu.permission:update');
-    Route::delete('/destroy/{id}', [ItemController::class, 'destroy'])->name('items.destroy')->middleware('menu.permission:destroy');
+    Route::get('/edit/{item}', [ItemController::class, 'edit'])->name('items.edit')->middleware('menu.permission:edit');
+    Route::put('/update/{item}', [ItemController::class, 'update'])->name('items.update')->middleware('menu.permission:update');
+    Route::post('/approve/{item}', [ItemController::class, 'approve'])->name('items.approve')->middleware('menu.permission:approve');
+    Route::post('/items/{item}/revise', [ItemController::class, 'revise'])->name('items.revise')->middleware('menu.permission:approve');
+    Route::post('/items/{item}/reject', [ItemController::class, 'reject'])->name('items.reject')->middleware('menu.permission:approve');
+    Route::get('items/{item}/printQR', [ItemController::class, 'printQR'])->name('items.printQR')->middleware('menu.permission:print');
+    Route::delete('/destroy/{item}', [ItemController::class, 'destroy'])->name('items.destroy')->middleware('menu.permission:destroy');
 });
 
 

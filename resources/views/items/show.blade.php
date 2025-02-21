@@ -77,6 +77,22 @@
             </div>
             <div class="row mb-3">
                 <div class="col-sm-3">
+                    <strong>Status:</strong>
+                </div>
+                <div class="col-sm-9">
+                    {{ $item->status }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3">
+                    <strong>Keterangan:</strong>
+                </div>
+                <div class="col-sm-9">
+                    {{ $item->keterangan }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3">
                     <strong>Gambar:</strong>
                 </div>
                 <div class="col-sm-9">
@@ -89,13 +105,47 @@
             </div>
         </div>
         <div class="card-footer d-flex justify-content-end align-items-center gap-2">
+            <!-- Tombol Approve -->
             @if ($approvalRoute && $item->approval_level == $approvalRoute->sequence - 1)
-                <form action="{{ route('items.approve', $item->id) }}" method="POST" class="form-approval d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-outline-success btn-approve">
-                        Approve <i class="bi bi-check2-square"></i>
-                    </button>
-                </form>
+                @if (!($item->approval_level > 0))
+                    <form action="{{ route('items.approve', $item->id) }}" method="POST" class="d-inline form-approval">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-success btn-approve">
+                            <i class="bi bi-check2-square"></i> Approve
+                        </button>
+                    </form>
+                @else
+                    <!-- Dropdown Action untuk Approve, Reject, dan Revise -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-success dropdown-toggle h-100" type="button"
+                            id="actionDropdown{{ $item->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                            Action
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $item->id }}">
+                            <li>
+                                <form action="{{ route('items.approve', $item->id) }}" method="POST"
+                                    class="d-inline form-approval">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item btn-approve text-success">Approve</button>
+                                </form>
+                            </li>
+                            {{-- <li>
+                                <form action="{{ route('items.revise', $item->id) }}" method="POST"
+                                    class="d-inline form-revisi">
+                                    @csrf
+                                    <button type="button" class="dropdown-item btn-revisi text-warning">Revisi</button>
+                                </form>
+                            </li> --}}
+                            <li>
+                                <form action="{{ route('items.reject', $item->id) }}" method="POST"
+                                    class="d-inline form-reject">
+                                    @csrf
+                                    <button type="button" class="dropdown-item btn-reject text-danger">Reject</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @endif
             @endif
             <a href="{{ route('items.index') }}" class="btn btn-sm btn-outline-secondary d-inline">
                 Kembali <i class="bi bi-x-square-fill"></i>

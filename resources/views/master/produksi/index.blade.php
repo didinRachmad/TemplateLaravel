@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
 @php
-    $page = 'users';
+    $page = 'master/produksi';
     $action = 'index';
 @endphp
 
 @section('content')
     <div class="card shadow-sm p-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Daftar Users</h2>
+            <h2>Daftar Produksi</h2>
 
             @if (auth()->user()->hasMenuPermission($menu->id, 'create'))
-                <a class="btn btn-outline-primary" href="{{ route('users.create') }}">
+                <a class="btn btn-outline-primary" href="{{ route('master_produksi.create') }}">
                     <i class="bi bi-plus-circle-fill"></i> Tambah Data
                 </a>
             @endif
@@ -21,44 +21,25 @@
             <thead class="bg-gd">
                 <tr>
                     <th>No</th>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>Produksi</th>
-                    <th>Kontak</th>
-                    <th>Role</th>
+                    <th>Nama Produksi</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($users as $key => $user)
+                @foreach ($produksis as $key => $produksi)
                     <tr>
                         <td>{{ $key + 1 }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->produksi->nama_produksi ?? '-' }}</td>
-                        <td>{{ $user->contact ?? '-' }}</td>
-                        <td>{{ implode(', ', $user->getRoleNames()->toArray()) }}</td>
-                        <td>
+                        <td>{{ $produksi->nama_produksi }}</td>
+                        <td class="text-center">
                             @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-outline-warning">
+                                <a href="{{ route('master_produksi.edit', $produksi->id) }}"
+                                    class="btn btn-sm btn-outline-warning">
                                     <i class="bi bi-pencil-square"></i> Edit
                                 </a>
                             @endif
 
-                            <!-- Tombol Reset Password -->
-                            @if (auth()->user()->hasMenuPermission($menu->id, 'update'))
-                                <form action="{{ route('users.reset-password', $user->id) }}" method="POST"
-                                    class="d-inline form-reset-password">
-                                    @csrf
-                                    <button type="button" class="btn btn-sm btn-outline-success btn-reset-password">
-                                        <i class="bi bi-check2-square"></i> Reset Password
-                                    </button>
-                                </form>
-                            @endif
-
-                            {{-- Tombol Hapus --}}
                             @if (auth()->user()->hasMenuPermission($menu->id, 'destroy'))
-                                <form action="{{ route('users.destroy', $user->id) }}" method="POST"
+                                <form action="{{ route('master_produksi.destroy', $produksi->id) }}" method="POST"
                                     class="form-delete d-inline">
                                     @csrf
                                     @method('DELETE')

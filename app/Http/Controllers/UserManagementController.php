@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Produksi;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -23,28 +24,29 @@ class UserManagementController extends Controller
     {
         // Ambil semua role (Anda bisa menyaring role yang diperbolehkan untuk assignment)
         $roles = Role::all();
-        return view('users.create', compact('roles'));
+        $produksiList = Produksi::all();
+        return view('users.create', compact('roles', 'produksiList'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'produksi' => 'nullable|string|max:10',
-            'contact' => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users',
+            'produksi' => 'nullable|exists:master_produksi,id',
+            'contact'  => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
             'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
+            'role_id'  => 'required|exists:roles,id',
         ]);
 
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name'             => $validated['name'],
-                'email'            => $validated['email'],
-                'produksi' => $validated['produksi'] ?? null,
-                'contact'         => $validated['contact'] ?? null,
-                'password'         => bcrypt($validated['password']),
+                'name'        => $validated['name'],
+                'email'       => $validated['email'],
+                'produksi_id' => $validated['produksi'] ?? null,
+                'contact'     => $validated['contact'] ?? null,
+                'password'    => bcrypt($validated['password']),
             ]);
 
             DB::commit();
@@ -66,22 +68,28 @@ class UserManagementController extends Controller
     public function edit(User $user)
     {
         // Tampilkan form edit user.
-        return view('users.edit', compact('user'));
+        $produksiList = Produksi::all();
+        return view('users.edit', compact('user', 'produksiList'));
     }
 
     public function update(Request $request, User $user)
     {
-        // Validasi input; pastikan field yang diupdate sesuai dengan kebutuhan
         $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'produksi' => 'nullable|string|max:10',
-            'contact' => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
+            'name'     => 'required|string',
+            'email'    => 'required|email',
+            'produksi' => 'nullable|exists:master_produksi,id',
+            'contact'  => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
         ]);
 
         DB::beginTransaction();
         try {
-            $user->update($validated);
+            $user->update([
+                'name'        => $validated['name'],
+                'email'       => $validated['email'],
+                'produksi_id' => $validated['produksi'] ?? null,
+                'contact'     => $validated['contact'] ?? null,
+            ]);
+
             DB::commit();
             session()->flash('success', 'Data users berhasil diperbarui.');
             return redirect()->route('users.index');

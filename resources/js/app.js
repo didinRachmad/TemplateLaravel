@@ -20,7 +20,7 @@ Fancybox.bind('[data-fancybox]');
 import moment from 'moment';
 import 'moment-timezone';
 
-import { showAlert, showToast, showConfirmDialog } from './components/alerts.js';
+import { showAlert, showToast, showConfirmDialog, showInputDialog } from './components/alerts.js';
 
 window.$ = $;
 window.jQuery = $;
@@ -42,18 +42,18 @@ Alpine.start();
 $(document).ready(function () {
     setTimeout(() => {
         $("#loading-screen").fadeOut("slow");
-    }, 200); // Delay 1 detik sebelum loading hilang
+    }, 200); // Delay 0,2 detik sebelum loading hilang
 });
 
-// Mendaftarkan semua file JS di folder ini (misalnya, item.js, users.js, posts.js)
-const modules = import.meta.glob('./*.js');
+// Mendaftarkan semua file JS termasuk di dalam subfolder
+const modules = import.meta.glob('./**/*.js');
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const page = document.body.dataset.page;   // Contoh: "item", "users", "posts"
+    const page = document.body.dataset.page;   // Contoh: "master/produksi"
     const action = document.body.dataset.action; // Contoh: "index", "create", "edit"
 
     if (page) {
-        // Bentuk path yang sesuai dengan daftar modul, misalnya "./item.js"
+        // Bentuk path yang sesuai dengan daftar modul, misalnya "./master/produksi.js"
         const modulePath = `./${page}.js`;
         if (modules[modulePath]) {
             try {
@@ -83,6 +83,7 @@ function capitalize(str) {
 window.showAlert = showAlert;
 window.showToast = showToast;
 window.showConfirmDialog = showConfirmDialog;
+window.showInputDialog = showInputDialog;
 
 document.addEventListener('click', function (e) {
     if (e.target.closest('.btn-delete')) {
@@ -108,6 +109,38 @@ document.addEventListener('click', function (e) {
             "Apakah Anda yakin?",
             "Password akan direset ke data awal!",
             () => form.submit()
+        );
+    } else if (e.target.closest('.btn-revisi')) {
+        e.preventDefault();
+        const form = e.target.closest('.form-revisi');
+        showInputDialog(
+            "Apakah Anda yakin?",
+            "Data item akan dikembalikan untuk proses revisi, silakan tambahkan keterangan!",
+            (keterangan) => {
+                // Buat input hidden untuk alasan dan submit form
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'keterangan';
+                hiddenInput.value = keterangan;
+                form.appendChild(hiddenInput);
+                form.submit();
+            }
+        );
+    }
+    else if (e.target.closest('.btn-reject')) {
+        e.preventDefault();
+        const form = e.target.closest('.form-reject');
+        showInputDialog(
+            "Apakah Anda yakin?",
+            "Data item akan direject! Silakan tambahkan alasan reject.",
+            (keterangan) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'keterangan';
+                hiddenInput.value = keterangan;
+                form.appendChild(hiddenInput);
+                form.submit();
+            }
         );
     }
 });

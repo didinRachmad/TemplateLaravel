@@ -30,7 +30,8 @@
                     <th>Nama Lokasi</th>
                     <th>Jumlah</th>
                     <th>Gambar</th>
-                    <th>Status Approval</th>
+                    <th>Status</th>
+                    <th>Keterangan</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -38,7 +39,7 @@
                 @foreach ($items as $key => $item)
                     <tr>
                         <td>{{ $key + 1 }}</td>
-                        <td>{{ $item->produksi }}</td>
+                        <td>{{ $item->produksi->nama_produksi }}</td>
                         <td>{{ $item->kode_item }}</td>
                         <td>{{ $item->nama_item }}</td>
                         <td>{{ $item->jenis }}</td>
@@ -54,12 +55,14 @@
                         </td>
                         <!-- Kolom Status Approval -->
                         <td>
-                            @if ($approvalRoute && $item->approval_level >= $approvalRoute->sequence)
+                            {{ $item->status }}
+                            {{-- @if ($approvalRoute && $item->approval_level + 2 == $approvalRoute->sequence)
                                 Approved
-                            @else
+                                @else
                                 {{ $item->status }}
-                            @endif
+                            @endif --}}
                         </td>
+                        <td>{{ $item->keterangan }}</td>
                         <td class="text-center">
                             <div class="btn-group" role="group">
                                 <!-- Tombol View -->
@@ -70,43 +73,65 @@
                                 @endif
 
                                 <!-- Tombol Approve -->
-                                @if ($approvalRoute && $item->approval_level == $approvalRoute->sequence - 1)
-                                    <!-- Dropdown Action untuk Approve, Reject, dan Revise -->
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                            id="actionDropdown{{ $item->id }}" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            Action
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $item->id }}">
-                                            <li>
-                                                <form action="{{ route('items.approve', $item->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="dropdown-item">Approve</button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <form action="{{ route('items.reject', $item->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="dropdown-item">Reject</button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <form action="{{ route('items.revise', $item->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="dropdown-item">Revise</button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                @if ($approvalRoute && $item->approval_level == $approvalRoute->sequence - 1 && $item->status !== 'Rejected')
+                                    @if (!($item->approval_level > 0))
+                                        <form action="{{ route('items.approve', $item->id) }}" method="POST"
+                                            class="d-inline form-approval">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-success btn-approve">
+                                                <i class="bi bi-check2-square"></i> Approve
+                                            </button>
+                                        </form>
+                                    @else
+                                        <!-- Dropdown Action untuk Approve, Reject, dan Revise -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-success dropdown-toggle h-100"
+                                                type="button" id="actionDropdown{{ $item->id }}"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                Action
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $item->id }}">
+                                                <li>
+                                                    <form action="{{ route('items.approve', $item->id) }}" method="POST"
+                                                        class="d-inline form-approval">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="dropdown-item btn-approve text-success">Approve</button>
+                                                    </form>
+                                                </li>
+                                                {{-- <li>
+                                                    <form action="{{ route('items.revise', $item->id) }}" method="POST"
+                                                        class="d-inline form-revisi">
+                                                        @csrf
+                                                        <button type="button"
+                                                            class="dropdown-item btn-revisi text-warning">Revisi</button>
+                                                    </form>
+                                                </li> --}}
+                                                <li>
+                                                    <form action="{{ route('items.reject', $item->id) }}" method="POST"
+                                                        class="d-inline form-reject">
+                                                        @csrf
+                                                        <button type="button"
+                                                            class="dropdown-item btn-reject text-danger">Reject</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    @endif
                                 @endif
+
+                                <!-- Tombol Print QR -->
+                                @if (auth()->user()->hasMenuPermission($menu->id, 'print'))
+                                    <a href="{{ route('items.printQR', $item->id) }}"
+                                        class="btn btn-sm btn-outline-secondary" target="_blank">
+                                        <i class="bi bi-printer"></i> Print QR
+                                    </a>
+                                @endif
+
 
                                 <!-- Tombol Edit dan Hapus hanya muncul jika kondisi terpenuhi -->
                                 @php
-                                    $canModify = !($item->approval_level > 1);
+                                    $canModify = !($item->approval_level > 0);
                                 @endphp
 
                                 @if ($canModify)
@@ -123,7 +148,7 @@
                                             onsubmit="return confirm('Anda yakin ingin menghapus item ini?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-delete">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete">
                                                 <i class="bi bi-trash-fill"></i> Hapus
                                             </button>
                                         </form>

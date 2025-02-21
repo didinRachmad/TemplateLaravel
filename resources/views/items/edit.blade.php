@@ -15,16 +15,18 @@
             </div>
             <div class="card-body">
                 <!-- Field Produksi -->
-                <div class="mb-3">
-                    <div class="form-group">
-                        <label for="produksi" class="form-label">Produksi</label>
-                        <select id="produksi" name="produksi" class="form-select" style="width: 100%;" required>
-                            <option value="P1" {{ old('produksi', $item->produksi) == 'P1' ? 'selected' : '' }}>P1
+                <div class="form-group mb-3">
+                    <label for="produksi" class="form-label">Produksi</label>
+                    <select id="produksi" name="produksi" class="form-select" style="width: 100%;">
+                        <option value="" {{ old('produksi', $item->produksi_id) == '' ? 'selected' : '' }}>Pilih
+                            Produksi</option>
+                        @foreach ($produksiList as $produksi)
+                            <option value="{{ $produksi->id }}"
+                                {{ old('produksi', $item->produksi_id) == $produksi->id ? 'selected' : '' }}>
+                                {{ $produksi->nama_produksi }}
                             </option>
-                            <option value="P2" {{ old('produksi', $item->produksi) == 'P2' ? 'selected' : '' }}>P2
-                            </option>
-                        </select>
-                    </div>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- Field Item -->

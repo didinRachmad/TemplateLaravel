@@ -28,7 +28,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'produksi',
+        'produksi_id',
         'contact',
     ];
 
@@ -76,5 +76,10 @@ class User extends Authenticatable
             ->whereIn('role_id', $roleIds)
             ->where('permission_id', $permission->id)
             ->exists();
+    }
+
+    public function produksi()
+    {
+        return $this->belongsTo(Produksi::class, 'produksi_id');
     }
 }

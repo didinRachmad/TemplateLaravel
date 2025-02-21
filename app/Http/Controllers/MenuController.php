@@ -65,13 +65,12 @@ class MenuController extends Controller
         }
     }
 
-    public function edit($id)
+    public function edit(Menu $menu)
     {
-        $menu = Menu::findOrFail($id);
         return view('menus.edit', compact('menu'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Menu $menu)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
@@ -82,13 +81,13 @@ class MenuController extends Controller
 
         DB::beginTransaction();
         try {
-            $menu = Menu::findOrFail($id);
-            $menu->title = $validatedData['title'];
-            $menu->route = $validatedData['route'];
-            $menu->icon = $validatedData['icon'];
-            $menu->order = $validatedData['order'];
+            $menu->update([
+                'title' => $validatedData['title'],
+                'route' => $validatedData['route'],
+                'icon' => $validatedData['icon'],
+                'order' => $validatedData['order'],
+            ]);
 
-            $menu->save();
             DB::commit();
             session()->flash('success', 'Data menu berhasil diperbarui.');
             return redirect()->route('menus.index');
@@ -100,11 +99,10 @@ class MenuController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Menu $menu)
     {
         DB::beginTransaction();
         try {
-            $menu = Menu::findOrFail($id);
             $menu->delete();
             DB::commit();
             session()->flash('success', 'Data menu berhasil dihapus.');

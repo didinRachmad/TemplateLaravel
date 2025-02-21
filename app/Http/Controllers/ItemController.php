@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ApprovalRoute;
 use App\Models\Item;
 use App\Models\Menu;
+use App\Models\Produksi;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\WhatsAppNotificationService;
@@ -22,23 +23,41 @@ class ItemController extends Controller
         $menu = Menu::where('route', 'items')->first();
 
         // Ambil nilai produksi dari user yang sedang login
-        $allowedProduksi = Auth::user()->produksi;
+        $allowedProduksi = Auth::user()->produksi_id;
         $items = $allowedProduksi ? Item::byProduksi($allowedProduksi)->get() : Item::all();
 
-        // Ambil role user saat ini (asumsi user hanya punya satu role)
+        // Ambil role user saat ini
         $currentRoleName = auth()->user()->getRoleNames()->first();
         $role = Role::where('name', $currentRoleName)->first();
+
         // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
         $approvalRoute = ApprovalRoute::where('module', 'items')
             ->where('role_id', $role->id)
             ->first();
+
+        // Filter data berdasarkan approval_level dan status
+        if ($approvalRoute) {
+            $items = $items->filter(function ($item) use ($approvalRoute) {
+                // Jika bukan tahap pertama, sembunyikan approval_level 0
+                if ($approvalRoute->sequence != 1 && $item->approval_level == 0) {
+                    return false;
+                }
+
+                // Jika item sudah "Rejected", jangan ditampilkan untuk user di approval level selanjutnya
+                if ($item->status === 'Rejected' && $approvalRoute->sequence > ($item->approval_level + 1)) {
+                    // dd($approvalRoute->sequence . ' > ' . $item->approval_level + 1);
+                    return false;
+                }
+
+                return true;
+            });
+        }
 
         // Kirim data ke view
         return view('items.index', compact('menu', 'items', 'approvalRoute'));
     }
 
-
-    public function show($id)
+    public function show(Item $item)
     {
         // Ambil role user saat ini (asumsi user hanya punya satu role)
         $currentRoleName = auth()->user()->getRoleNames()->first();
@@ -48,20 +67,20 @@ class ItemController extends Controller
             ->where('role_id', $role->id)
             ->first();
 
-        $item = Item::findOrFail($id);
         return view('items.show', compact('item', 'approvalRoute'));
     }
 
     public function create()
     {
-        return view('items.create');
+        $produksiList = Produksi::all();
+        return view('items.create', compact('produksiList'));
     }
 
     public function store(Request $request)
     {
         // Validasi input
         $validatedData = $request->validate([
-            'produksi' => 'required|string|max:255',
+            'produksi' => 'nullable|exists:master_produksi,id',
             'kode_item' => 'required|string|max:255',
             'nama_item' => 'required|string|max:255',
             'jenis' => 'required|string|max:255',
@@ -81,8 +100,8 @@ class ItemController extends Controller
             }
 
             // Simpan item baru
-            $item = Item::create([
-                'produksi' => $validatedData['produksi'],
+            Item::create([
+                'produksi_id' => $validatedData['produksi'],
                 'kode_item' => $validatedData['kode_item'],
                 'nama_item' => $validatedData['nama_item'],
                 'jenis' => $validatedData['jenis'],
@@ -95,73 +114,6 @@ class ItemController extends Controller
 
             DB::commit();
 
-            // Cek approval tahap pertama (sequence = 1)
-            $approvalRoute = ApprovalRoute::where('module', 'items')
-                ->where('sequence', 1)
-                ->first();
-
-            if ($approvalRoute) {
-                // Set status "Menunggu approval dari {role_name}"
-                $item->update([
-                    'status' => "Menunggu approval dari {$approvalRoute->role->name}"
-                ]);
-
-                // Ambil user yang harus melakukan approval
-                $approvalUsers = $approvalRoute->assigned_user_id
-                    ? User::where('id', $approvalRoute->assigned_user_id)->get()
-                    : Role::find($approvalRoute->role_id)->users;
-
-                if ($approvalUsers->count() > 0) {
-                    $waService = new WhatsAppNotificationService();
-
-                    // Kirim notifikasi ke setiap user yang terlibat
-                    foreach ($approvalUsers as $approvalUser) {
-                        // Filter berdasarkan produksi:
-                        // Jika user memiliki produksi, maka hanya kirim jika sama dengan produksi item.
-                        // Jika produksi null, kirim notifikasi tanpa filter.
-                        if ($approvalUser->contact) {
-                            if ($approvalUser->produksi !== null && $approvalUser->produksi !== $item->produksi) {
-                                continue; // Lewati user yang produksinya tidak sesuai
-                            }
-
-                            // Siapkan parameter pesan
-                            $parameters = [
-                                "body" => [
-                                    [
-                                        "key"        => "1",
-                                        "value"      => "nama_aplikasi",
-                                        "value_text" => "Pendataan Item Motasa"
-                                    ],
-                                    [
-                                        "key"        => "2",
-                                        "value"      => "yth",
-                                        "value_text" => "Kepada yth. " . $approvalUser->name
-                                    ],
-                                    [
-                                        "key"        => "3",
-                                        "value"      => "konten",
-                                        "value_text" => "Terdapat permintaan persetujuan pada sistem pendataan barang MOI. Silakan akses alamat berikut untuk menyetujui: " . url('/')
-                                    ],
-                                ]
-                            ];
-
-                            $waService->sendMessage(
-                                $approvalUser->name,
-                                $approvalUser->contact,
-                                "7c8de24b-bc38-4dc7-b0dd-1e1ae693b653", // Template ID
-                                "0e407445-9744-49b6-a648-0801dea7f33a", // Channel Integration ID
-                                $parameters
-                            );
-                        }
-                    }
-                }
-            } else {
-                // Jika tidak ada approval tahap berikutnya, status bisa ditentukan sesuai kebutuhan
-                $item->update([
-                    'status' => "Tidak memerlukan approval"
-                ]);
-            }
-
             session()->flash('success', 'Data berhasil ditambahkan.');
             return redirect()->route('items.index');
         } catch (\Exception $e) {
@@ -172,16 +124,16 @@ class ItemController extends Controller
         }
     }
 
-    public function edit($id)
+    public function edit(Item $item)
     {
-        $item = Item::findOrFail($id);
-        return view('items.edit', compact('item'));
+        $produksiList = Produksi::all();
+        return view('items.edit', compact('item', 'produksiList'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Item $item)
     {
         $validatedData = $request->validate([
-            'produksi' => 'required|string|max:255',
+            'produksi' => 'nullable|exists:master_produksi,id',
             'kode_item' => 'required|string|max:255',
             'nama_item' => 'required|string|max:255',
             'jenis' => 'required|string|max:255',
@@ -194,25 +146,28 @@ class ItemController extends Controller
 
         DB::beginTransaction();
         try {
-            $item = Item::findOrFail($id);
-            $item->produksi = $validatedData['produksi'];
-            $item->kode_item = $validatedData['kode_item'];
-            $item->nama_item = $validatedData['nama_item'];
-            $item->jenis = $validatedData['jenis'];
-            $item->kondisi = $validatedData['kondisi'];
-            $item->kode_lokasi = $validatedData['kode_lokasi'];
-            $item->nama_lokasi = $validatedData['nama_lokasi'];
-            $item->jumlah = $validatedData['jumlah'];
+            $item->update([
+                'produksi_id' => $validatedData['produksi'],
+                'kode_item' => $validatedData['kode_item'],
+                'nama_item' => $validatedData['nama_item'],
+                'jenis' => $validatedData['jenis'],
+                'kondisi' => $validatedData['kondisi'],
+                'kode_lokasi' => $validatedData['kode_lokasi'],
+                'nama_lokasi' => $validatedData['nama_lokasi'],
+                'jumlah' => $validatedData['jumlah'],
+            ]);
 
+            // Cek apakah ada file gambar yang diupload
             if ($request->hasFile('gambar')) {
+                // Hapus gambar lama jika ada
                 if ($item->gambar && Storage::exists('public/' . $item->gambar)) {
                     Storage::delete('public/' . $item->gambar);
                 }
+                // Simpan gambar baru
                 $gambarPath = $request->file('gambar')->store('uploads', 'public');
-                $item->gambar = $gambarPath;
+                $item->update(['gambar' => $gambarPath]);
             }
 
-            $item->save();
             DB::commit();
             session()->flash('success', 'Data item berhasil diperbarui.');
             return redirect()->route('items.index');
@@ -224,11 +179,10 @@ class ItemController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Item $item)
     {
         DB::beginTransaction();
         try {
-            $item = Item::findOrFail($id);
             if ($item->gambar && Storage::exists('public/' . $item->gambar)) {
                 Storage::delete('public/' . $item->gambar);
             }
@@ -244,14 +198,14 @@ class ItemController extends Controller
         }
     }
 
-    public function approve($id, Request $request)
+    public function approve(Item $item)
     {
         // Ambil data menu 'items'
         $menu = Menu::where('route', 'items')->first();
 
         // Ambil role user saat ini
         $currentRoleName = auth()->user()->getRoleNames()->first();
-        $role = \Spatie\Permission\Models\Role::where('name', $currentRoleName)->first();
+        $role = Role::where('name', $currentRoleName)->first();
 
         // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
         $approvalRoute = ApprovalRoute::where('module', 'items')
@@ -262,27 +216,25 @@ class ItemController extends Controller
             abort(403, 'Anda tidak memiliki hak untuk melakukan approval.');
         }
 
-        // Ambil item yang akan di-approve
-        $item = Item::findOrFail($id);
-
-        // Pastikan item dalam status pending untuk approval user ini:
+        // Pastikan item dalam status draft untuk approval user ini:
         if ($item->approval_level !== ($approvalRoute->sequence - 1)) {
-            abort(403, 'Item tidak dalam status pending untuk approval Anda.');
+            abort(403, 'Item tidak dalam status draft untuk approval Anda.');
         }
 
         // Update approval_level menjadi nilai konfigurasi (misal, jika sequence = 1, maka item approval_level menjadi 1)
         $item->approval_level = $approvalRoute->sequence;
 
-        // Update status: jika ada konfigurasi approval berikutnya, tampilkan keterangan pending untuk role berikutnya
+        // Update status: jika ada konfigurasi approval berikutnya
         $nextApprovalRoute = ApprovalRoute::where('module', 'items')
             ->where('sequence', '>', $approvalRoute->sequence)
             ->orderBy('sequence', 'asc')
             ->first();
-
         if ($nextApprovalRoute) {
-            $item->status = "Menunggu approval dari {$nextApprovalRoute->role->name}";
+            $item->status = "Waiting Approval";
+            $item->keterangan = "Menunggu approval dari {$nextApprovalRoute->role->name}";
         } else {
-            $item->status = "Final approved";
+            $item->status = "Final";
+            $item->keterangan = "Final approved";
         }
 
         $item->save();
@@ -303,7 +255,7 @@ class ItemController extends Controller
                     // Jika user memiliki produksi, maka hanya kirim jika sama dengan produksi item.
                     // Jika produksi null, kirim notifikasi tanpa filter.
                     if ($approvalUser->contact) {
-                        if ($approvalUser->produksi !== null && $approvalUser->produksi !== $item->produksi) {
+                        if (($approvalUser->produksi_id !== null && $approvalUser->produksi_id !== '') && $approvalUser->produksi_id !== $item->produksi_id) {
                             continue; // Lewati user yang produksinya tidak sesuai
                         }
 
@@ -341,5 +293,67 @@ class ItemController extends Controller
 
         session()->flash('success', 'Item berhasil di-approve.');
         return redirect()->route('items.index');
+    }
+
+    public function revise(Item $item, Request $request)
+    {
+        // Validasi input
+        $validatedData = $request->validate([
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $roleName = auth()->user()->getRoleNames()->first();
+
+        DB::beginTransaction();
+
+        try {
+            // Kembalikan ke tahap awal approval
+            $item->approval_level = 0;
+            $item->status = 'Revisi';
+            $item->keterangan = $validatedData['keterangan'] . ' | Diajukan oleh ' . $roleName;
+            $item->save();
+
+            DB::commit();
+            session()->flash('success', 'data Item dikembalikan untuk Revisi.');
+            return redirect()->route('items.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saat revise item: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat mengembalikan item untuk Revisi. Silakan coba lagi.');
+            return redirect()->back()->withInput();
+        }
+    }
+
+    public function reject(Item $item, Request $request)
+    {
+        // Validasi input
+        $validatedData = $request->validate([
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $roleName = auth()->user()->getRoleNames()->first();
+
+        DB::beginTransaction();
+
+        try {
+            $item->status = 'Rejected';
+            $item->keterangan = $validatedData['keterangan'] . ' | Rejected oleh ' . $roleName;
+            $item->save();
+
+            DB::commit();
+            session()->flash('success', 'data Item telah direject.');
+            return redirect()->route('items.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saat reject item: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat mereject data item. Silakan coba lagi.');
+            return redirect()->back()->withInput();
+        }
+    }
+
+    public function printQR($id)
+    {
+        $item = Item::findOrFail($id);
+        return view('items.printQR', compact('item'));
     }
 }

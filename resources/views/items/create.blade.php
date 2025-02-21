@@ -14,14 +14,16 @@
             </div>
             <div class="card-body">
                 <!-- Field Produksi -->
-                <div class="mb-3">
-                    <div class="form-group">
-                        <label for="produksi" class="form-label">Produksi</label>
-                        <select id="produksi" name="produksi" class="form-select" style="width: 100%;" required>
-                            <option value="P1" {{ old('produksi') == 'P1' ? 'selected' : '' }}>P1</option>
-                            <option value="P2" {{ old('produksi') == 'P2' ? 'selected' : '' }}>P2</option>
-                        </select>
-                    </div>
+                <div class="form-group mb-3">
+                    <label for="produksi" class="form-label">Produksi</label>
+                    <select id="produksi" name="produksi" class="form-select" style="width: 100%;">
+                        <option value="" selected>Pilih Produksi</option>
+                        @foreach ($produksiList as $produksi)
+                            <option value="{{ $produksi->id }}" {{ old('produksi') == $produksi->id ? 'selected' : '' }}>
+                                {{ $produksi->nama_produksi }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <!-- Field Item -->
                 <div class="mb-3">
@@ -67,22 +69,27 @@
                 </div>
                 <!-- Field Lokasi -->
                 <div class="mb-3">
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="kode_lokasi" class="form-label">Kode Lokasi</label>
-                                <select id="kode_lokasi" name="kode_lokasi" class="form-control" required>
-                                    <option value="{{ old('kode_lokasi', $kode_lokasi ?? '') }}">
-                                        {{ old('kode_lokasi', $kode_lokasi ?? '') }}
-                                    </option>
-                                </select>
+                                <input type="text" id="kode_lokasi" name="kode_lokasi" class="form-control"
+                                    value="{{ old('kode_lokasi') }}">
                             </div>
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label for="nama_lokasi" class="form-label">Nama Lokasi</label>
-                                <input type="text" id="nama_lokasi" name="nama_lokasi" class="form-control bg-light"
-                                    readonly value="{{ old('nama_lokasi') }}">
+                                <input type="text" id="nama_lokasi" name="nama_lokasi" class="form-control"
+                                    value="{{ old('nama_lokasi') }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="detail_lokasi" class="form-label">Detail Lokasi</label>
+                                <textarea id="detail_lokasi" name="detail_lokasi" class="form-control" value="{{ old('detail_lokasi') }}"></textarea>
                             </div>
                         </div>
                     </div>

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->string('produksi');
+            $table->unsignedBigInteger('produksi_id')->nullable()->change();
+            $table->foreign('produksi_id')->references('id')->on('master_produksi')->nullOnDelete();
             $table->string('kode_item');
             $table->string('nama_item');
             $table->string('jenis');
@@ -23,7 +24,8 @@ return new class extends Migration
             $table->decimal('jumlah', 8, 2);
             $table->string('gambar'); // Menyimpan nama file gambar
             $table->integer('approval_level')->default(0);
-            $table->string('status')->default('Pending');
+            $table->string('status')->default('Draft');
+            $table->string('keterangan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
