@@ -11,7 +11,7 @@ class Produksi extends Model
 
     protected $table = 'master_produksi';
 
-    protected $fillable = ['nama_produksi'];
+    protected $fillable = ['name'];
 
     public function users()
     {

@@ -16,7 +16,7 @@
                     <strong>Produksi:</strong>
                 </div>
                 <div class="col-sm-9">
-                    {{ $item->produksi }}
+                    {{ $item->produksi->name }}
                 </div>
             </div>
             <div class="row mb-3">

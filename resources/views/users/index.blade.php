@@ -35,7 +35,7 @@
                         <td>{{ $key + 1 }}</td>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
-                        <td>{{ $user->produksi->nama_produksi ?? '-' }}</td>
+                        <td>{{ $user->produksi->name ?? '-' }}</td>
                         <td>{{ $user->contact ?? '-' }}</td>
                         <td>{{ implode(', ', $user->getRoleNames()->toArray()) }}</td>
                         <td>

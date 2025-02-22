@@ -39,7 +39,7 @@
                 @foreach ($items as $key => $item)
                     <tr>
                         <td>{{ $key + 1 }}</td>
-                        <td>{{ $item->produksi->nama_produksi }}</td>
+                        <td>{{ $item->produksi->name }}</td>
                         <td>{{ $item->kode_item }}</td>
                         <td>{{ $item->nama_item }}</td>
                         <td>{{ $item->jenis }}</td>

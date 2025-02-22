@@ -29,7 +29,7 @@
                 @foreach ($produksis as $key => $produksi)
                     <tr>
                         <td>{{ $key + 1 }}</td>
-                        <td>{{ $produksi->nama_produksi }}</td>
+                        <td>{{ $produksi->name }}</td>
                         <td class="text-center">
                             @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
                                 <a href="{{ route('master_produksi.edit', $produksi->id) }}"

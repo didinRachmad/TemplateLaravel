@@ -31,6 +31,7 @@ class UserSeeder extends Seeder
             'update',
             'destroy',
             'approve',
+            'print',
         ];
 
         foreach ($permissions as $permission) {
@@ -64,7 +65,6 @@ class UserSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('12345678'),
-            'produksi' => 'P1',
         ]);
         $superAdmin->assignRole($superAdminRole);
 
@@ -72,7 +72,6 @@ class UserSeeder extends Seeder
             'name' => 'Admin MOI',
             'email' => 'admin@moi.com',
             'password' => Hash::make('12345678'),
-            'produksi' => 'P1',
         ]);
         $user1->assignRole($adminMoiRole);
 
@@ -80,7 +79,6 @@ class UserSeeder extends Seeder
             'name' => 'Andry Studian',
             'email' => 'andry@managerhc.com',
             'password' => Hash::make('12345678'),
-            'produksi' => 'P1',
         ]);
         $user2->assignRole($managerHCRole);
 
@@ -88,7 +86,6 @@ class UserSeeder extends Seeder
             'name' => 'Yanuar Irnanto',
             'email' => 'yanuar@managerhc.com',
             'password' => Hash::make('12345678'),
-            'produksi' => 'P2',
         ]);
         $user3->assignRole($managerHCRole);
 

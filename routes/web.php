@@ -104,7 +104,7 @@ Route::prefix('items')->middleware('auth')->group(function () {
     Route::post('/approve/{item}', [ItemController::class, 'approve'])->name('items.approve')->middleware('menu.permission:approve');
     Route::post('/items/{item}/revise', [ItemController::class, 'revise'])->name('items.revise')->middleware('menu.permission:approve');
     Route::post('/items/{item}/reject', [ItemController::class, 'reject'])->name('items.reject')->middleware('menu.permission:approve');
-    Route::get('items/{item}/printQR', [ItemController::class, 'printQR'])->name('items.printQR')->middleware('menu.permission:print');
+    Route::get('items/{item}/print', [ItemController::class, 'printQR'])->name('items.printQR')->middleware('menu.permission:print');
     Route::delete('/destroy/{item}', [ItemController::class, 'destroy'])->name('items.destroy')->middleware('menu.permission:destroy');
 });
 

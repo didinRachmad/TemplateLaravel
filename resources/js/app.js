@@ -145,3 +145,13 @@ document.addEventListener('click', function (e) {
     }
 });
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.pathname.includes("/print")) {
+        window.print();
+
+        window.onafterprint = function () {
+            window.close();
+        };
+    }
+});

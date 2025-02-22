@@ -14,8 +14,8 @@
             </div>
             <div class="card-body">
                 <div class="form-group">
-                    <label for="nama_produksi">Nama Produksi</label>
-                    <input type="text" id="nama_produksi" name="nama_produksi" class="form-control" required>
+                    <label for="name">Nama Produksi</label>
+                    <input type="text" id="name" name="name" class="form-control" required>
                 </div>
             </div>
             <div class="card-footer text-end">

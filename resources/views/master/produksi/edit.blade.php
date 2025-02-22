@@ -15,9 +15,9 @@
             </div>
             <div class="card-body">
                 <div class="form-group mb-3">
-                    <label for="nama_produksi">Nama Produksi</label>
-                    <input type="text" id="nama_produksi" name="nama_produksi" class="form-control"
-                        value="{{ $produksi->nama_produksi }}" required>
+                    <label for="name">Nama Produksi</label>
+                    <input type="text" id="name" name="name" class="form-control"
+                        value="{{ $produksi->name }}" required>
                 </div>
             </div>
             <div class="card-footer text-end">

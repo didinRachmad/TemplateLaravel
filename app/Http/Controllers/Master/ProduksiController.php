@@ -28,14 +28,12 @@ class ProduksiController extends Controller
     // Menyimpan produksi baru
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_produksi' => 'required|unique:master_produksi,nama_produksi',
+        $request->validate(['name' => 'required|unique:master_produksi,name',
         ]);
 
         DB::beginTransaction();
         try {
-            Produksi::create([
-                'nama_produksi' => $request->nama_produksi,
+            Produksi::create(['name' => $request->name,
             ]);
             DB::commit();
             session()->flash('success', 'Data produksi berhasil dibuat.');
@@ -57,14 +55,12 @@ class ProduksiController extends Controller
     // Memperbarui produksi
     public function update(Request $request, Produksi $produksi)
     {
-        $request->validate([
-            'nama_produksi' => 'required|unique:master_produksi,nama_produksi,' . $produksi->id,
+        $request->validate(['name' => 'required|unique:master_produksi,name,' . $produksi->id,
         ]);
 
         DB::beginTransaction();
         try {
-            $produksi->update([
-                'nama_produksi' => $request->nama_produksi,
+            $produksi->update(['name' => $request->name,
             ]);
             DB::commit();
             session()->flash('success', 'Data produksi berhasil diperbarui.');

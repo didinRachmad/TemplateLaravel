@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('produksi_id')->nullable()->change();
+            $table->unsignedBigInteger('produksi_id')->nullable();
             $table->foreign('produksi_id')->references('id')->on('master_produksi')->nullOnDelete();
             $table->string('kode_item');
             $table->string('nama_item');
