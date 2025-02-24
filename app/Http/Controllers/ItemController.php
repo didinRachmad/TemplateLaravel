@@ -78,38 +78,41 @@ class ItemController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input
+        // Validasi input, untuk file gambar sekarang mendukung multiple upload
         $validatedData = $request->validate([
-            'produksi' => 'nullable|exists:master_produksi,id',
-            'kode_item' => 'required|string|max:255',
-            'nama_item' => 'required|string|max:255',
-            'jenis' => 'required|string|max:255',
-            'kondisi' => 'required|string|max:255',
+            'produksi'   => 'required|exists:master_produksi,id',
+            'kode_item'  => 'nullable|string|max:255',
+            'nama_item'  => 'nullable|string|max:255',
+            'jenis'      => 'required|string|max:255',
+            'kondisi'    => 'required|string|max:255',
             'kode_lokasi' => 'required|string|max:255',
             'nama_lokasi' => 'required|string|max:255',
-            'jumlah' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
-            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'jumlah'     => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+            // Validasi untuk multiple file: pastikan field 'gambar' ada dan setiap elemen adalah file gambar
+            'gambar'     => 'nullable',
+            'gambar.*'   => 'image|mimes:jpeg,png,jpg|max:8192',
         ]);
 
-        $gambarPath = null;
         DB::beginTransaction();
 
         try {
+            $gambarPaths = [];
             if ($request->hasFile('gambar')) {
-                $gambarPath = $request->file('gambar')->store('uploads', 'public');
+                // Perulangan untuk menyimpan setiap file gambar yang diupload
+                foreach ($request->file('gambar') as $file) {
+                    $path = $file->store('uploads', 'public');
+                    $gambarPaths[] = $path;
+                }
             }
 
-            // Simpan item baru
+            // Simpan item baru, simpan data gambar sebagai array (tidak perlu json_encode)
             Item::create([
-                'produksi_id' => $validatedData['produksi'],
-                'kode_item' => $validatedData['kode_item'],
-                'nama_item' => $validatedData['nama_item'],
-                'jenis' => $validatedData['jenis'],
-                'kondisi' => $validatedData['kondisi'],
-                'kode_lokasi' => $validatedData['kode_lokasi'],
-                'nama_lokasi' => $validatedData['nama_lokasi'],
-                'jumlah' => $validatedData['jumlah'],
-                'gambar' => $gambarPath ?? null,
+                'produksi_id' => $validatedData['produksi'], 'kode_item'   => $validatedData['kode_item'] ?? "TES",
+                'nama_item'   => $validatedData['nama_item'] ?? "TES",
+                'jenis'       => $validatedData['jenis'],
+                'kondisi'     => $validatedData['kondisi'],
+                'kode_lokasi' => $validatedData['kode_lokasi'], 'nama_lokasi' => $validatedData['nama_lokasi'], 'jumlah'      => $validatedData['jumlah'],
+                'gambar'      => $gambarPaths, // langsung simpan array
             ]);
 
             DB::commit();
@@ -132,49 +135,78 @@ class ItemController extends Controller
 
     public function update(Request $request, Item $item)
     {
-        $validatedData = $request->validate([
-            'produksi' => 'nullable|exists:master_produksi,id',
-            'kode_item' => 'required|string|max:255',
-            'nama_item' => 'required|string|max:255',
-            'jenis' => 'required|string|max:255',
-            'kondisi' => 'required|string|max:255',
-            'kode_lokasi' => 'required|string|max:255',
-            'nama_lokasi' => 'required|string|max:255',
-            'jumlah' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        // Aturan dasar validasi untuk field-field lain
+        $rules = [
+            'produksi'      => 'nullable|exists:master_produksi,id',
+            'kode_item'     => 'nullable|string|max:255',
+            'nama_item'     => 'nullable|string|max:255',
+            'jenis'         => 'required|string|max:255',
+            'kondisi'       => 'required|string|max:255',
+            'kode_lokasi'   => 'required|string|max:255',
+            'nama_lokasi'   => 'required|string|max:255',
+            'jumlah'        => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+            // Validasi 'gambar' harus berupa array (bisa kosong)
+            'gambar'        => 'nullable|array',
+        ];
+
+        // Jika ada file yang diupload (instance UploadedFile),
+        // maka validasi tiap elemen array sebagai file gambar
+        if ($request->hasFile('gambar')) {
+            $rules['gambar.*'] = 'image|mimes:jpeg,png,jpg|max:8192';
+        }
+
+        $validatedData = $request->validate($rules);
 
         DB::beginTransaction();
-        try {
-            $item->update([
-                'produksi_id' => $validatedData['produksi'],
-                'kode_item' => $validatedData['kode_item'],
-                'nama_item' => $validatedData['nama_item'],
-                'jenis' => $validatedData['jenis'],
-                'kondisi' => $validatedData['kondisi'],
-                'kode_lokasi' => $validatedData['kode_lokasi'],
-                'nama_lokasi' => $validatedData['nama_lokasi'],
-                'jumlah' => $validatedData['jumlah'],
-            ]);
 
-            // Cek apakah ada file gambar yang diupload
-            if ($request->hasFile('gambar')) {
-                // Hapus gambar lama jika ada
-                if ($item->gambar && Storage::exists('public/' . $item->gambar)) {
-                    Storage::delete('public/' . $item->gambar);
-                }
-                // Simpan gambar baru
-                $gambarPath = $request->file('gambar')->store('uploads', 'public');
-                $item->update(['gambar' => $gambarPath]);
+        try {
+            // Data gambar lama (sudah tersimpan di database)
+            // Pastikan $oldImages adalah array, jika tidak, decode terlebih dahulu
+            $oldImages = $item->gambar;
+            if (!is_array($oldImages)) {
+                $oldImages = json_decode($oldImages, true) ?? [];
             }
 
+            $newImages = [];
+            if ($request->has('gambar')) {
+                foreach ($request->gambar as $gambar) {
+                    // Jika berupa string, artinya gambar lama yang dipertahankan
+                    if (is_string($gambar)) {
+                        $newImages[] = $gambar;
+                    } else {
+                        // Jika merupakan instance UploadedFile, berarti gambar baru diupload
+                        $path = $gambar->store('uploads', 'public');
+                        $newImages[] = $path;
+                    }
+                }
+            }
+
+            // Optional: Hapus file fisik yang sudah dihapus (ada di $oldImages tapi tidak di $newImages)
+            $imagesToDelete = array_diff($oldImages, $newImages);
+            foreach ($imagesToDelete as $imgPath) {
+                Storage::disk('public')->delete($imgPath);
+            }
+
+            // Perbaikan: Karena field 'gambar' di-cast sebagai array, simpan data sebagai array (tidak perlu json_encode)
+            $item->update([
+                'produksi_id' => $validatedData['produksi'],
+                'kode_item'   => $validatedData['kode_item'] ?? $item->kode_item,
+                'nama_item'   => $validatedData['nama_item'] ?? $item->nama_item,
+                'jenis'       => $validatedData['jenis'],
+                'kondisi'     => $validatedData['kondisi'],
+                'kode_lokasi' => $validatedData['kode_lokasi'],
+                'nama_lokasi' => $validatedData['nama_lokasi'],
+                'jumlah'      => $validatedData['jumlah'],
+                'gambar'      => $newImages,
+            ]);
+
             DB::commit();
-            session()->flash('success', 'Data item berhasil diperbarui.');
+            session()->flash('success', 'Data berhasil diperbarui.');
             return redirect()->route('items.index');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error saat memperbarui item: ' . $e->getMessage());
-            session()->flash('error', 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.');
+            Log::error('Error saat update item: ' . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat memperbarui data.');
             return redirect()->back()->withInput();
         }
     }

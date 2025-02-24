@@ -6,6 +6,10 @@
 @import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css';
 @import 'sweetalert2/dist/sweetalert2.min.css';
 @import "@fancyapps/ui/dist/fancybox/fancybox.css";
+@import 'filepond/dist/filepond.min.css';
+@import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
+@import 'filepond-plugin-file-poster/dist/filepond-plugin-file-poster.css';
+@import 'filepond-plugin-image-overlay/dist/filepond-plugin-image-overlay.css';
 
 @import 'custom.css';
 

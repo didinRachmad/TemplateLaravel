@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('kode_lokasi');
             $table->string('nama_lokasi');
             $table->decimal('jumlah', 8, 2);
-            $table->string('gambar'); // Menyimpan nama file gambar
+            $table->text('gambar')->nullable(); // Menyimpan nama file gambar
             $table->integer('approval_level')->default(0);
             $table->string('status')->default('Draft');
             $table->string('keterangan')->nullable();

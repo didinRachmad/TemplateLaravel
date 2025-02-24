@@ -98,3 +98,33 @@ div.dt-paging ul.pagination {
     margin: 2px 0;
     flex-wrap: wrap;
 }
+/* FilePond */
+/* Atur kontainer FilePond sebagai flex container */
+.filepond--list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    /* Jarak antara item */
+}
+
+/* Atur item FilePond */
+.filepond--item {
+    flex: 1 1 calc(50% - 0.5em);
+    /* Dua item per baris dengan jarak */
+    box-sizing: border-box;
+}
+
+/* Pastikan overlay menutupi seluruh halaman dan berada di depan */
+.filepond--fullsize-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999 !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.filepond--credits {
+    display: none;
+}

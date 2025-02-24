@@ -46,20 +46,20 @@
         </div>
     </div>
 </body>
+{{-- @vite(['resources/js/app.js']) --}}
 
-<!-- Menampilkan pesan sukses -->
 @if (session('success'))
     <script type="module">
         showToast("{{ session('success') }}", "success");
     </script>
 @endif
-<!-- Menampilkan pesan error -->
+
 @if (session('error'))
     <script type="module">
         showToast("{{ session('error') }}", "error");
     </script>
 @endif
-<!-- Menampilkan pesan validasi -->
+
 @if ($errors->any())
     <script type="module">
         @foreach ($errors->all() as $error)
@@ -67,5 +67,6 @@
         @endforeach
     </script>
 @endif
+
 
 </html>

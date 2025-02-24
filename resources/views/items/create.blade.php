@@ -16,7 +16,7 @@
                 <!-- Field Produksi -->
                 <div class="form-group mb-3">
                     <label for="produksi" class="form-label">Produksi</label>
-                    <select id="produksi" name="produksi" class="form-select" style="width: 100%;">
+                    <select id="produksi" name="produksi" class="form-select" style="width: 100%;" required>
                         <option value="" selected>Pilih Produksi</option>
                         @foreach ($produksiList as $produksi)
                             <option value="{{ $produksi->id }}" {{ old('produksi') == $produksi->id ? 'selected' : '' }}>
@@ -31,7 +31,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="kode_item" class="form-label">Kode Item</label>
-                                <select id="kode_item" name="kode_item" class="form-control" required>
+                                <select id="kode_item" name="kode_item" class="form-control">
                                     <option value="{{ old('kode_item', $kode_item ?? '') }}">
                                         {{ old('kode_item', $kode_item ?? '') }}
                                     </option>
@@ -104,10 +104,14 @@
                 </div>
                 <!-- Field Gambar -->
                 <div class="mb-3">
-                    <div class="form-group">
-                        <label for="gambar" class="form-label">Gambar</label>
-                        <input type="file" name="gambar" id="gambar" class="form-control" accept="image/*"
-                            capture="environment" required>
+                    <div class="row justify-content-center mb-3">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="gambar" class="form-label">Gambar</label>
+                                <input type="file" name="gambar[]" id="upload-images" class="form-control"
+                                    accept="image/*" required>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

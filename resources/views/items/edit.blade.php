@@ -110,17 +110,14 @@
 
                 <!-- Field Gambar -->
                 <div class="mb-3">
-                    <div class="form-group">
-                        <label for="gambar" class="form-label">Gambar</label>
-                        <input type="file" name="gambar" id="gambar" class="form-control" accept="image/*"
-                            capture="environment">
-                        @if ($item->gambar)
-                            <a href="{{ asset('storage/' . $item->gambar) }}" data-fancybox="gallery"
-                                data-caption="Gambar {{ old('nama_item', $item->nama_item) }}">
-                                <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Item"
-                                    class="img-thumbnail mt-2" width="150">
-                            </a>
-                        @endif
+                    <div class="row justify-content-center mb-3">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="upload-images" class="form-label">Gambar</label>
+                                <input type="file" name="gambar[]" id="upload-images" class="form-control"
+                                    accept="image/*">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -131,4 +128,9 @@
             </div>
         </form>
     </div>
+
+    <!-- Kirim data gambar yang tersimpan ke variabel global -->
+    <script>
+        window.storedImagesPaths = @json($item->gambar);
+    </script>
 @endsection

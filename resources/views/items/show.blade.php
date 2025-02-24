@@ -96,11 +96,17 @@
                     <strong>Gambar:</strong>
                 </div>
                 <div class="col-sm-9">
-                    <a href="{{ asset('storage/' . $item->gambar) }}" data-fancybox="gallery"
-                        data-caption="Gambar {{ $item->nama_item }}">
-                        <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Item" class="img-thumbnail mt-2"
-                            width="150">
-                    </a>
+                    @if (!empty($item->gambar))
+                        @foreach ($item->gambar as $gambar)
+                            <a href="{{ asset('storage/' . $gambar) }}" data-fancybox="gallery"
+                                data-caption="Gambar {{ $item->nama_item }}">
+                                <img src="{{ asset('storage/' . $gambar) }}" alt="Gambar Item" class="img-thumbnail mt-2"
+                                    width="150">
+                            </a>
+                        @endforeach
+                    @else
+                        <p>Tidak ada gambar tersedia.</p>
+                    @endif
                 </div>
             </div>
         </div>
