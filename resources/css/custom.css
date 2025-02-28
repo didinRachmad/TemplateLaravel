@@ -94,6 +94,10 @@ a {
     border-radius: 0.5rem !important;
 }
 
+div.dt-container div.dt-paging ul.pagination {
+    gap: 5px !important;
+}
+
 .active>.page-link,
 .page-link.active {
     background-color: #2CA9BC !important;
@@ -103,6 +107,7 @@ a {
 
 .page-link {
     color: #2CA9BC !important;
+    border-radius: 0.5rem !important;
 }
 
 /* Pastikan wadah pagination menggunakan flexbox dan meratakan konten ke kanan */
