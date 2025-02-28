@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Produksi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,10 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $produksiList = Produksi::all();
         return view('profile.edit', [
             'user' => $request->user(),
+            'produksiList' => $produksiList,
         ]);
     }
 
@@ -34,11 +37,19 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        // Update field produksi dan contact
-        $user->produksi = $request->input('produksi');
+        // Update field contact (karena field produksi sudah tidak ada di tabel users)
         $user->contact = $request->input('contact');
-
         $user->save();
+
+        // Update relasi many-to-many produksi
+        // Pastikan input produksi_id berupa array ID produksi
+        $produksiIds = $request->input('produksi_id');
+        if ($produksiIds) {
+            $user->produksis()->sync($produksiIds);
+        } else {
+            // Jika tidak ada produksi yang dipilih, detach semua relasi
+            $user->produksis()->detach();
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

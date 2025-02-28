@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Produksi extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'master_produksi';
 
@@ -15,7 +16,7 @@ class Produksi extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class, 'produksi_id');
+        return $this->belongsToMany(User::class, 'user_produksi', 'produksi_id', 'user_id');
     }
 
     public function items()

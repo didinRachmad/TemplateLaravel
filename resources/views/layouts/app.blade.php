@@ -8,6 +8,9 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -25,7 +28,7 @@
         </div>
     </div>
 
-    <div class="min-h-screen bg-gray-100" style="padding-top: 60px;">
+    <div class="min-h-screen bg-gray-100" style="margin-top: 60px;">
         @include('layouts.navigation')
 
         <!-- Page Heading -->

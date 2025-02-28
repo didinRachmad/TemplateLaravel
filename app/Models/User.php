@@ -78,8 +78,8 @@ class User extends Authenticatable
             ->exists();
     }
 
-    public function produksi()
+    public function produksis()
     {
-        return $this->belongsTo(Produksi::class, 'produksi_id');
+        return $this->belongsToMany(Produksi::class, 'user_produksi', 'user_id', 'produksi_id');
     }
 }

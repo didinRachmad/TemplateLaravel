@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-{{-- @php
+@php
     $page = 'profile';
-    $action = 'index';
-@endphp --}}
+    $action = 'edit';
+@endphp
 
 @section('content')
     {{-- <x-app-layout> --}}

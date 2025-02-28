@@ -6,7 +6,7 @@
 @endphp
 
 @section('content')
-    <div class="card shadow-sm">
+    <div class="card rounded-lg shadow-sm">
         <form action="{{ route('master_produksi.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="card-header bg-gd text-white">
@@ -15,13 +15,14 @@
             <div class="card-body">
                 <div class="form-group">
                     <label for="name">Nama Produksi</label>
-                    <input type="text" id="name" name="name" class="form-control" required>
+                    <input type="text" id="name" name="name" class="form-control form-control-sm" required>
                 </div>
             </div>
             <div class="card-footer text-end">
-                <a href="{{ route('master_produksi.index') }}" class="btn btn-outline-secondary">Batal <i
+                <a href="{{ route('master_produksi.index') }}" class="btn btn-sm rounded-lg btn-outline-secondary">Batal <i
                         class="bi bi-x-square-fill"></i></a>
-                <button type="submit" class="btn btn-outline-primary">Simpan <i class="bi bi-save-fill"></i></button>
+                <button type="submit" class="btn btn-sm rounded-lg btn-outline-primary">Simpan <i
+                        class="bi bi-save-fill"></i></button>
             </div>
         </form>
     </div>

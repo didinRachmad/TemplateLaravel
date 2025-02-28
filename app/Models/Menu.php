@@ -10,7 +10,16 @@ class Menu extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['title', 'route', 'icon', 'order'];
+    protected $fillable = ['title', 'route', 'parent_id', 'icon', 'order'];
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Menu::class, 'parent_id')->orderBy('order')->with('children');
+    }
 
     public function roles()
     {

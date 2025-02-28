@@ -1,4 +1,3 @@
-// resources/js/app.js
 import $ from 'jquery';
 import select2 from 'select2';
 import * as bootstrap from 'bootstrap';
@@ -17,8 +16,8 @@ import Alpine from 'alpinejs';
 // --- Inisialisasi plugin yang tidak bergantung pada DOM --- //
 select2();
 Fancybox.bind('[data-fancybox]');
+// -----------------
 
-// Ekspos variabel dan fungsi ke global scope agar bisa diakses di inline script pada Blade
 window.$ = $;
 window.jQuery = $;
 window.showToast = showToast;
@@ -28,7 +27,12 @@ window.showInputDialog = showInputDialog;
 window.Alpine = Alpine;
 Alpine.start();
 
-// Daftarkan modul halaman secara dinamis (misalnya semua file JS di folder pages)
+// URL API dari .env
+const API_URLS = {
+    items: import.meta.env.VITE_API_ITEMS_SERVICE,
+};
+window.API_URLS = API_URLS;
+
 const modules = import.meta.glob('./pages/**/*.js');
 
 // Helper function untuk kapitalisasi string
@@ -71,7 +75,70 @@ $(document).ready(async function () {
         }
     }
 
-    // 4. Jika halaman mengandung "/print" pada URL, cetak halaman dan tutup setelah cetak
+    // 4. Show Alert
+    $(document).on('click', function (e) {
+        const $target = $(e.target);
+
+        if ($target.closest('.btn-delete').length) {
+            e.preventDefault();
+            const $form = $target.closest('.form-delete');
+            showConfirmDialog(
+                "Apakah Anda yakin?",
+                "Data yang dihapus tidak bisa dikembalikan!",
+                () => $form.submit()
+            );
+        } else if ($target.closest('.btn-approve').length) {
+            e.preventDefault();
+            const $form = $target.closest('.form-approval');
+            showConfirmDialog(
+                "Apakah Anda yakin?",
+                "Harap periksa kembali sebelum melakukan approve data!",
+                () => $form.submit()
+            );
+        } else if ($target.closest('.btn-reset-password').length) {
+            e.preventDefault();
+            const $form = $target.closest('.form-reset-password');
+            showConfirmDialog(
+                "Apakah Anda yakin?",
+                "Password akan direset ke data awal!",
+                () => $form.submit()
+            );
+        } else if ($target.closest('.btn-revisi').length) {
+            e.preventDefault();
+            const $form = $target.closest('.form-revisi');
+            showInputDialog(
+                "Apakah Anda yakin?",
+                "Data item akan dikembalikan untuk proses revisi, silakan tambahkan keterangan!",
+                (keterangan) => {
+                    const $hiddenInput = $('<input>', {
+                        type: 'hidden',
+                        name: 'keterangan',
+                        value: keterangan
+                    });
+                    $form.append($hiddenInput);
+                    $form.submit();
+                }
+            );
+        } else if ($target.closest('.btn-reject').length) {
+            e.preventDefault();
+            const $form = $target.closest('.form-reject');
+            showInputDialog(
+                "Apakah Anda yakin?",
+                "Data item akan direject! Silakan tambahkan alasan reject.",
+                (keterangan) => {
+                    const $hiddenInput = $('<input>', {
+                        type: 'hidden',
+                        name: 'keterangan',
+                        value: keterangan
+                    });
+                    $form.append($hiddenInput);
+                    $form.submit();
+                }
+            );
+        }
+    });
+
+    // 5. Jika halaman mengandung "/print" pada URL, cetak halaman dan tutup setelah cetak
     if (window.location.pathname.includes("/print")) {
         window.print();
         window.onafterprint = function () {
@@ -79,7 +146,7 @@ $(document).ready(async function () {
         };
     }
 
-    // 5. Inisialisasi FilePond untuk input upload gambar
+    // 6. Inisialisasi FilePond untuk input upload gambar
     const fileInput = $("#upload-images")[0];
     if (fileInput) {
         // Daftarkan plugin-file yang diperlukan
@@ -185,5 +252,20 @@ $(document).ready(async function () {
         //         }
         //     });
         // }
+    }
+
+    // 7. Scan QR
+    const scanModalEl = $('#scanModal');
+    if (scanModalEl.length) {
+        scanModalEl.on('shown.bs.modal', function () {
+            import('./modules/scanQR')
+                .then(module => {
+                    console.log("Modul scanQR.js berhasil diimport.");
+                    module.startQRScan();
+                })
+                .catch(error => {
+                    console.error("Gagal mengimport scanQR.js:", error);
+                });
+        });
     }
 });

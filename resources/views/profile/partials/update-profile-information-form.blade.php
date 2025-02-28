@@ -52,15 +52,17 @@
 
         <!-- Field untuk Allowed Produksi -->
         <div>
-            <x-input-label for="produksi" :value="__('Produksi')" />
-            <select id="produksi" name="produksi"
+            <x-input-label for="produksi_id" :value="__('Produksi')" />
+            <select id="produksi_id" name="produksi_id[]" multiple
                 class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                <option value="" {{ old('produksi', $user->produksi) == '' ? 'selected' : '' }}>--Select--
-                </option>
-                <option value="P1" {{ old('produksi', $user->produksi) == 'P1' ? 'selected' : '' }}>P1</option>
-                <option value="P2" {{ old('produksi', $user->produksi) == 'P2' ? 'selected' : '' }}>P2</option>
+                @foreach ($produksiList as $produksi)
+                    <option value="{{ $produksi->id }}"
+                        {{ in_array($produksi->id, old('produksi_id', $user->produksis->pluck('id')->toArray())) ? 'selected' : '' }}>
+                        {{ $produksi->name }}
+                    </option>
+                @endforeach
             </select>
-            <x-input-error class="mt-2" :messages="$errors->get('produksi')" />
+            <x-input-error class="mt-2" :messages="$errors->get('produksi_id')" />
         </div>
 
         <!-- Field untuk Contact -->

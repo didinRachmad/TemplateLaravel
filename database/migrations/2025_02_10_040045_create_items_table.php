@@ -17,10 +17,12 @@ return new class extends Migration
             $table->foreign('produksi_id')->references('id')->on('master_produksi')->nullOnDelete();
             $table->string('kode_item');
             $table->string('nama_item');
+            $table->string('satuan');
             $table->string('jenis');
             $table->string('kondisi');
-            $table->string('kode_lokasi');
-            $table->string('nama_lokasi');
+            $table->string('kode_lokasi')->nullable();
+            $table->string('nama_lokasi')->nullable();
+            $table->string('detail_lokasi')->nullable();
             $table->decimal('jumlah', 8, 2);
             $table->text('gambar')->nullable(); // Menyimpan nama file gambar
             $table->integer('approval_level')->default(0);

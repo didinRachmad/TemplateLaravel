@@ -1,14 +1,14 @@
 <?php
 
-use App\Http\Controllers\ApprovalRouteController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\ItemController;
 use App\Http\Controllers\Master\ProduksiController;
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\Transaksi\ItemController;
+use App\Http\Controllers\Transaksi\MutasiController;
+use App\Http\Controllers\Setting\RoleController;
+use App\Http\Controllers\Setting\PermissionController;
+use App\Http\Controllers\Setting\UserManagementController;
+use App\Http\Controllers\Setting\MenuController;
+use App\Http\Controllers\Setting\ApprovalRouteController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -100,12 +100,20 @@ Route::prefix('items')->middleware('auth')->group(function () {
     Route::get('/create', [ItemController::class, 'create'])->name('items.create')->middleware('menu.permission:create');
     Route::post('/store', [ItemController::class, 'store'])->name('items.store')->middleware('menu.permission:store');
     Route::get('/edit/{item}', [ItemController::class, 'edit'])->name('items.edit')->middleware('menu.permission:edit');
+    Route::get('/checkQR/{id}', [ItemController::class, 'checkQR'])->name('items.checkQR')->middleware('menu.permission:show');
     Route::put('/update/{item}', [ItemController::class, 'update'])->name('items.update')->middleware('menu.permission:update');
     Route::post('/approve/{item}', [ItemController::class, 'approve'])->name('items.approve')->middleware('menu.permission:approve');
     Route::post('/items/{item}/revise', [ItemController::class, 'revise'])->name('items.revise')->middleware('menu.permission:approve');
     Route::post('/items/{item}/reject', [ItemController::class, 'reject'])->name('items.reject')->middleware('menu.permission:approve');
     Route::get('items/{item}/print', [ItemController::class, 'printQR'])->name('items.printQR')->middleware('menu.permission:print');
     Route::delete('/destroy/{item}', [ItemController::class, 'destroy'])->name('items.destroy')->middleware('menu.permission:destroy');
+});
+
+Route::prefix('mutasi')->middleware('auth')->group(function () {
+    Route::get('/', [MutasiController::class, 'index'])->name('mutasi.index')->middleware('menu.permission:index');
+    Route::get('/show/{item}', [MutasiController::class, 'show'])->name('mutasi.show')->middleware('menu.permission:show');
+    Route::get('/edit/{item}', [MutasiController::class, 'edit'])->name('mutasi.edit')->middleware('menu.permission:edit');
+    Route::put('/update/{item}', [MutasiController::class, 'update'])->name('mutasi.update')->middleware('menu.permission:update');
 });
 
 

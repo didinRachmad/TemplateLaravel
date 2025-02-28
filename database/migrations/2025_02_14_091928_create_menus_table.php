@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('menus')->onDelete('cascade');
             $table->string('title');        // Nama menu (misal: Dashboard, Items, dll)
             $table->string('route')->nullable(); // Route terkait (jika ada)
             $table->string('icon')->nullable();  // Icon (opsional)

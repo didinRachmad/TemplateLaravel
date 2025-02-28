@@ -85,6 +85,24 @@ a {
 .bg-gd {
     --bs-table-bg: none;
     background: linear-gradient(270deg, #73c9cc 0%, #2CA9BC 100%) !important;
+    border-radius: 0.5rem !important;
+}
+
+.bg-gd-rev {
+    --bs-table-bg: none;
+    background: linear-gradient(270deg, #2CA9BC 0%, #73c9cc 100%) !important;
+    border-radius: 0.5rem !important;
+}
+
+.active>.page-link,
+.page-link.active {
+    background-color: #2CA9BC !important;
+    border-color: #2CA9BC !important;
+    color: #fff !important;
+}
+
+.page-link {
+    color: #2CA9BC !important;
 }
 
 /* Pastikan wadah pagination menggunakan flexbox dan meratakan konten ke kanan */
@@ -98,6 +116,7 @@ div.dt-paging ul.pagination {
     margin: 2px 0;
     flex-wrap: wrap;
 }
+
 /* FilePond */
 /* Atur kontainer FilePond sebagai flex container */
 .filepond--list {
