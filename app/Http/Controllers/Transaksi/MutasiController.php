@@ -29,9 +29,7 @@ class MutasiController extends Controller
 
         if ($allowedProduksi) {
             // Jika user memiliki nilai produksi, ambil item berdasarkan produksi tersebut dan status Final
-            $items = Item::byProduksi($allowedProduksi)
-                ->where('status', 'Final')
-                ->get();
+            $items = Item::byProduksi($allowedProduksi)->where('status', 'Final')->get();
         } else {
             // Jika tidak ada nilai produksi, ambil semua item dengan status Final
             $items = Item::where('status', 'Final')->get();
@@ -59,50 +57,85 @@ class MutasiController extends Controller
     public function update(Request $request, Item $item)
     {
         $validatedData = $request->validate([
-            'produksi_baru'  => 'required|exists:master_produksi,id',
-            'lokasi_baru'    => 'required|string|max:255',
+            'produksi_baru' => 'required|exists:master_produksi,id',
+            'lokasi_baru' => 'required|string|max:255',
             'detail_lokasi_baru' => 'required|string|max:255',
-            'jumlah_mutasi'  => 'required|numeric|min:1',
+            'jumlah_mutasi' => 'required|numeric|min:1',
         ]);
 
         DB::beginTransaction();
 
         try {
             $jumlah_sekarang = $item->jumlah;
-            $jumlah_mutasi  = $validatedData['jumlah_mutasi'];
+            $jumlah_mutasi = $validatedData['jumlah_mutasi'];
 
+            // Pengecekan: jumlah mutasi tidak boleh melebihi jumlah data awal
             if ($jumlah_mutasi > $jumlah_sekarang) {
                 session()->flash('error', 'Jumlah mutasi tidak boleh melebihi jumlah item yang tersedia.');
                 return redirect()->back()->withInput();
             }
 
+            // Tentukan field yang akan dicatat log-nya
+            $fields = ['produksi_id', 'nama_lokasi', 'detail_lokasi', 'jumlah'];
+
+            // Ambil data lama dari item dan letakkan 'nama_produksi' di awal
+            $baseOldData = array_intersect_key($item->toArray(), array_flip($fields));
+            $oldData = array_merge(['nama_produksi' => optional($item->produksi)->name], $baseOldData);
+
             if ($jumlah_mutasi == $jumlah_sekarang) {
-                // Mutasi TOTAL
+                // Mutasi TOTAL: update langsung tanpa membuat item baru
                 $item->update([
                     'produksi_id' => $validatedData['produksi_baru'],
                     'nama_lokasi' => $validatedData['lokasi_baru'],
                     'detail_lokasi' => $validatedData['detail_lokasi_baru'],
                 ]);
             } else {
+                // Partial mutasi: update item lama dengan sisa jumlah
                 $sisa = $jumlah_sekarang - $jumlah_mutasi;
                 $item->update([
                     'jumlah' => $sisa,
                 ]);
 
+                // Buat item baru dengan jumlah mutasi
                 $dataBaru = [
                     'produksi_id' => $validatedData['produksi_baru'],
-                    'kode_item'   => $item->kode_item,
-                    'nama_item'   => $item->nama_item,
-                    'satuan'      => $item->satuan,
-                    'jenis'       => $item->jenis,
-                    'kondisi'     => $item->kondisi,
+                    'kode_item' => $item->kode_item,
+                    'nama_item' => $item->nama_item,
+                    'satuan' => $item->satuan,
+                    'jenis' => $item->jenis,
+                    'kondisi' => $item->kondisi,
                     'nama_lokasi' => $validatedData['lokasi_baru'],
                     'detail_lokasi' => $validatedData['detail_lokasi_baru'],
-                    'jumlah'      => $jumlah_mutasi,
-                    // 'gambar'     => $item->gambar,
+                    'jumlah' => $jumlah_mutasi,
+                    'gambar' => $item->gambar,
+                    'approval_level' => $item->approval_level,
+                    'status' => $item->status,
+                    'keterangan' => $item->keterangan,
                 ];
 
                 Item::create($dataBaru);
+            }
+
+            // Ambil data baru (new_data) setelah update, sertakan relasi 'produksi'
+            $itemFresh = $item->fresh(['produksi']);
+            $baseNewData = array_intersect_key($itemFresh->toArray(), array_flip($fields));
+            $newData = array_merge(['nama_produksi' => optional($itemFresh->produksi)->name], $baseNewData);
+
+            // Jika tidak ada perubahan pada data yang diupdate, batalkan transaksi
+            if ($oldData == $newData) {
+                DB::rollBack();
+                throw new \Exception('Tidak ada data yang berubah.');
+            } else {
+                // Simpan log aktivitas hanya jika ada perubahan
+                activity()
+                    ->performedOn($item)
+                    ->causedBy(auth()->user() ?? null)
+                    ->withProperties([
+                        'jumlah_mutasi' => $jumlah_mutasi,
+                        'old_data' => $oldData,
+                        'new_data' => $newData,
+                    ])
+                    ->log('Proses mutasi item dilakukan');
             }
 
             DB::commit();
@@ -110,8 +143,11 @@ class MutasiController extends Controller
             return redirect()->route('mutasi.index');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error saat mutasi: ' . $e->getMessage());
-            session()->flash('error', 'Terjadi kesalahan saat melakukan mutasi.');
+            if ($e->getMessage() === 'Tidak ada data yang berubah.') {
+                session()->flash('error', $e->getMessage());
+            } else {
+                session()->flash('error', 'Terjadi kesalahan saat melakukan mutasi.');
+            }
             return redirect()->back()->withInput();
         }
     }

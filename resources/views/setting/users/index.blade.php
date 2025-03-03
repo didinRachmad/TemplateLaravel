@@ -11,13 +11,13 @@
         <div class="card rounded-lg shadow p-3 position-relative mx-auto bg-gd-rev"
             style="width: 100%; top: -10px; transform: translateY(-10px); text-align: center;">
             <div class="d-flex justify-content-between align-items-center">
-                <h3 class="fw-bold mb-0">Daftar Users</h2>
+                <div class="display-6 fw-bold mb-0">Daftar Users</div>
 
-                    @if (auth()->user()->hasMenuPermission($menu->id, 'create'))
-                        <a class="btn btn-sm rounded-lg btn-primary shadow-sm" href="{{ route('users.create') }}">
-                            <i class="bi bi-plus-circle-fill"></i> Tambah Data
-                        </a>
-                    @endif
+                @if (auth()->user()->hasMenuPermission($menu->id, 'create'))
+                    <a class="btn btn-sm rounded-lg btn-primary shadow-sm" href="{{ route('users.create') }}">
+                        <i class="bi bi-plus-circle-fill"></i> Tambah Data
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -53,7 +53,7 @@
                         <td>
                             @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
                                 <a href="{{ route('users.edit', $user->id) }}"
-                                    class="btn btn-sm rounded-lg btn-sm btn-outline-warning" data-bs-toggle="tooltip"
+                                    class="btn btn-sm rounded-lg btn-outline-warning" data-bs-toggle="tooltip"
                                     data-bs-title="Edit">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
@@ -65,7 +65,7 @@
                                     class="d-inline form-reset-password">
                                     @csrf
                                     <button type="button"
-                                        class="btn btn-sm rounded-lg btn-sm btn-outline-secondary btn-reset-password"
+                                        class="btn btn-sm rounded-lg btn-outline-secondary btn-reset-password"
                                         data-bs-toggle="tooltip" data-bs-title="Reset Password">
                                         <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
@@ -78,8 +78,7 @@
                                     class="form-delete d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button"
-                                        class="btn btn-sm rounded-lg btn-sm btn-outline-danger btn-delete"
+                                    <button type="button" class="btn btn-sm rounded-lg btn-outline-danger btn-delete"
                                         data-bs-toggle="tooltip" data-bs-title="Hapus">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>

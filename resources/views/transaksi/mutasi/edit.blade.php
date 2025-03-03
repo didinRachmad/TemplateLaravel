@@ -103,7 +103,8 @@
                     <label for="jumlah_mutasi" class="form-label">Jumlah Mutasi</label>
                     <input type="number" id="jumlah_mutasi" name="jumlah_mutasi" class="form-control form-control-sm"
                         step="0.01" value="{{ old('jumlah_mutasi') }}" max="{{ $item->jumlah }}"
-                        placeholder="Masukkan jumlah mutasi" required>
+                        oninvalid="this.setCustomValidity('Nilai tidak boleh lebih dari {{ $item->jumlah }}')"
+                        oninput="this.setCustomValidity('')" placeholder="Masukkan jumlah mutasi" required>
                 </div>
 
             </div>

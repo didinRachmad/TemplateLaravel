@@ -20,6 +20,7 @@ Fancybox.bind('[data-fancybox]');
 
 window.$ = $;
 window.jQuery = $;
+window.bootstrap = bootstrap;
 window.showToast = showToast;
 window.showAlert = showAlert;
 window.showConfirmDialog = showConfirmDialog;
