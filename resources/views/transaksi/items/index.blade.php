@@ -8,7 +8,7 @@
 @section('content')
     <div class="card rounded-lg shadow-sm px-5 pb-5 pt-0 mt-3 position-relative">
         <!-- Card Judul Melayang -->
-        <div class="card rounded-lg shadow p-3 position-relative mx-auto bg-gd-rev"
+        <div class="card border-0 rounded-lg shadow p-3 position-relative mx-auto bg-gd-rev"
             style="width: 100%; top: -10px; transform: translateY(-10px); text-align: center;">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="display-6 fw-bold mb-0">Daftar item Bekas (di Luar MOI)</div>
