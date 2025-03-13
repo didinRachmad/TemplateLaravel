@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ApprovalRoute extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['module', 'role_id', 'sequence', 'assigned_user_id'];
 

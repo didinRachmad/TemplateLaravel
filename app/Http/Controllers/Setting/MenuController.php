@@ -21,7 +21,7 @@ class MenuController extends Controller
         $menu_id = Menu::where('route', 'menus')->first();
 
         // Pengecekan hak akses untuk melihat daftar menu
-        if (!$menu_id || !Auth::user()->hasMenuPermission(
+        if (!$menu_id || !auth()->user()->hasMenuPermission(
             $menu_id->id,
             'index'
         )) {

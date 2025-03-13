@@ -46,7 +46,7 @@
                             <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
                                 {{-- <div class="btn btn-sm rounded-lg btn-group" role="group"> --}}
                                 <!-- Tombol View -->
-                                @if (Auth::user()->hasMenuPermission($menu->id, 'show'))
+                                @if (auth()->user()->hasMenuPermission($menu->id, 'show'))
                                     <a href="{{ route('mutasi.show', $item->id) }}"
                                         class="btn btn-sm rounded-lg btn-outline-info" data-bs-toggle="tooltip"
                                         data-bs-title="Detail">
@@ -55,7 +55,7 @@
                                 @endif
 
                                 <!-- Tombol Edit  -->
-                                @if (Auth::user()->hasMenuPermission($menu->id, 'edit'))
+                                @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
                                     <a href="{{ route('mutasi.edit', $item->id) }}"
                                         class="btn btn-sm rounded-lg btn-outline-warning" data-bs-toggle="tooltip"
                                         data-bs-title="Edit">
@@ -63,7 +63,7 @@
                                     </a>
                                 @endif
 
-                                @if (Auth::user()->hasMenuPermission($menu->id, 'show'))
+                                @if (auth()->user()->hasMenuPermission($menu->id, 'show'))
                                     <button class="btn btn-sm rounded-lg btn-outline-info view-history"
                                         data-item-id="{{ $item->id }}" data-bs-toggle="tooltip"
                                         data-bs-title="Riwayat Mutasi">

@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class MenuRolePermission extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'menu_role_permission';
 

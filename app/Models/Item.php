@@ -57,7 +57,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Item extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['produksi_id', 'kode_item', 'nama_item', 'satuan', 'jenis', 'kondisi', 'kode_lokasi', 'nama_lokasi', 'detail_lokasi', 'jumlah', 'gambar', 'approval_level', 'status', 'keterangan'];
 
