@@ -8,6 +8,7 @@ use App\Models\ApprovalRoute;
 use App\Models\Menu;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApprovalRouteController extends Controller
