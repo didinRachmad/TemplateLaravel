@@ -13,13 +13,13 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="display-6 fw-bold mb-0">Daftar item Bekas (di Luar MOI)</div>
                 <div class="text-center d-flex justify-content-center align-items-center flex-nowrap gap-1">
-                    @if (auth()->user()->hasMenuPermission($menu->id, 'show'))
+                    @if (Auth::user()->hasMenuPermission($menu->id, 'show'))
                         <button class="btn btn-sm rounded-lg btn-secondary" id="btn-scan" data-bs-toggle="modal"
                             data-bs-target="#scanModal">
                             <i class="bi bi-qr-code-scan"></i> Scan QR
                         </button>
                     @endif
-                    @if (auth()->user()->hasMenuPermission($menu->id, 'create'))
+                    @if (Auth::user()->hasMenuPermission($menu->id, 'create'))
                         <a class="btn btn-sm rounded-lg btn-primary shadow-sm" href="{{ route('items.create') }}">
                             <i class="bi bi-plus-circle-fill"></i> Tambah Data
                         </a>
@@ -76,7 +76,7 @@
                                 <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
                                     {{-- <div class="btn btn-sm rounded-lg btn-group" role="group"> --}}
                                     <!-- Tombol View -->
-                                    @if (auth()->user()->hasMenuPermission($menu->id, 'show'))
+                                    @if (Auth::user()->hasMenuPermission($menu->id, 'show'))
                                         <a href="{{ route('items.show', $item->id) }}"
                                             class="btn btn-sm rounded-lg btn-outline-info" data-bs-toggle="tooltip"
                                             data-bs-title="Detail">
@@ -139,7 +139,7 @@
                                     @endif
 
                                     <!-- Tombol Print QR -->
-                                    @if (auth()->user()->hasMenuPermission($menu->id, 'print'))
+                                    @if (Auth::user()->hasMenuPermission($menu->id, 'print'))
                                         <a href="{{ route('items.printQR', $item->id) }}"
                                             class="btn btn-sm rounded-lg btn-outline-secondary" target="_blank"
                                             data-bs-toggle="tooltip" data-bs-title="Print QR">
@@ -154,7 +154,7 @@
                                     @endphp
 
                                     @if ($canModify)
-                                        @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
+                                        @if (Auth::user()->hasMenuPermission($menu->id, 'edit'))
                                             <a href="{{ route('items.edit', $item->id) }}"
                                                 class="btn btn-sm rounded-lg btn-outline-warning" data-bs-toggle="tooltip"
                                                 data-bs-title="Edit">
@@ -162,7 +162,7 @@
                                             </a>
                                         @endif
 
-                                        @if (auth()->user()->hasMenuPermission($menu->id, 'destroy'))
+                                        @if (Auth::user()->hasMenuPermission($menu->id, 'destroy'))
                                             <form action="{{ route('items.destroy', $item->id) }}" method="POST"
                                                 class="form-delete d-inline"
                                                 onsubmit="return confirm('Anda yakin ingin menghapus item ini?');">
