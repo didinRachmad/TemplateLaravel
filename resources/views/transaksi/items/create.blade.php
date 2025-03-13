@@ -106,8 +106,8 @@
                             <div class="form-group">
                                 <label for="satuan" class="form-label">Satuan</label>
                                 <input type="text" id="satuan" name="satuan"
-                                    class="form-control form-control-sm bg-light" required readonly
-                                    value="{{ old('satuan') }}">
+                                    class="form-control form-control-sm bg-light" readonly value="{{ old('satuan') }}"
+                                    required>
                             </div>
                         </div>
                     </div>

@@ -1,9 +1,16 @@
 export default {
-    initIndex() {
-        console.log('Halaman User Index berhasil dimuat!');
-        let table;
-        table = $("#datatables").DataTable({
-            dom: "<'row'<'col-sm-12 col-md-3'l><'col-sm-12 col-md-6 mb-3 mb-md-0 d-flex justify-content-center align-items-center'><'col-sm-12 col-md-3 text-right'f>>" +
+    async initIndex() {
+        console.log("Halaman User Index berhasil dimuat!");
+
+        // Dynamic import DataTables hanya jika diperlukan
+        await Promise.all([
+            import("datatables.net-bs5"),
+            import("datatables.net-buttons-bs5"),
+        ]);
+
+        const table = $("#datatables").DataTable({
+            dom:
+                "<'row'<'col-sm-12 col-md-3'l><'col-sm-12 col-md-6 mb-3 mb-md-0 d-flex justify-content-center align-items-center'><'col-sm-12 col-md-3 text-right'f>>" +
                 "<'row py-2'<'col-sm-12 table-responsive'tr>>" +
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             paging: true,
@@ -17,7 +24,7 @@ export default {
             columnDefs: [
                 {
                     targets: 0, // Menargetkan kolom pertama
-                    className: 'text-center', // Menambahkan kelas text-center untuk meratakan teks ke tengah
+                    className: "text-center", // Menambahkan kelas text-center untuk meratakan teks ke tengah
                 },
             ],
             info: true,
@@ -40,8 +47,10 @@ export default {
                 //     sPrevious: "Sebelumnya",
                 // },
                 oAria: {
-                    sSortAscending: ": aktifkan untuk mengurutkan kolom secara menaik",
-                    sSortDescending: ": aktifkan untuk mengurutkan kolom secara menurun",
+                    sSortAscending:
+                        ": aktifkan untuk mengurutkan kolom secara menaik",
+                    sSortDescending:
+                        ": aktifkan untuk mengurutkan kolom secara menurun",
                 },
             },
         });
@@ -61,24 +70,24 @@ export default {
             .draw();
     },
     initShow() {
-        console.log('Halaman User Show berhasil dimuat!');
+        console.log("Halaman User Show berhasil dimuat!");
     },
     initCreate() {
-        console.log('Halaman User Create berhasil dimuat!');
+        console.log("Halaman User Create berhasil dimuat!");
         $(document).ready(function () {
-            $('#produksi').select2({
+            $("#produksi").select2({
                 placeholder: "Pilih Produksi",
-                allowClear: true
+                allowClear: true,
             });
         });
     },
     initEdit() {
-        console.log('Halaman User Edit berhasil dimuat!');
+        console.log("Halaman User Edit berhasil dimuat!");
         $(document).ready(function () {
-            $('#produksi').select2({
+            $("#produksi").select2({
                 placeholder: "Pilih Produksi",
-                allowClear: true
+                allowClear: true,
             });
         });
-    }
+    },
 };

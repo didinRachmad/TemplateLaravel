@@ -24,7 +24,7 @@
     <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="wave">
-            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
     </div>
 
@@ -65,9 +65,7 @@
 
 @if ($errors->any())
     <script type="module">
-        @foreach ($errors->all() as $error)
-            showToast("{{ $error }}", "error");
-        @endforeach
+        showToast("Gagal", "error", `{!! join('<br>', $errors->all()) !!}`);
     </script>
 @endif
 
