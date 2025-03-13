@@ -29,7 +29,7 @@ class ApprovalRouteController extends Controller
     {
         $menus = Menu::whereNotNull('route')->orderBy('order')->get();
         $roles = Role::all();
-        $users = auth()->user()->all();
+        $users = Auth::user()->all();
         return view('setting.approval_routes.create', compact('roles', 'users', 'menus'));
     }
 
@@ -66,7 +66,7 @@ class ApprovalRouteController extends Controller
         $route = ApprovalRoute::findOrFail($id);
         $menus = Menu::orderBy('order')->get();
         $roles = Role::all();
-        $users = auth()->user()->all();
+        $users = Auth::user()->all();
         return view('setting.approval_routes.edit', compact('route', 'roles', 'users', 'menus'));
     }
 

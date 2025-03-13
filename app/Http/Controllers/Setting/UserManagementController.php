@@ -132,7 +132,7 @@ class UserManagementController extends Controller
                 'password' => Hash::make($defaultPassword),
             ]);
 
-            Log::info("Password untuk user {$user->email} telah direset oleh " . auth()->user()->email);
+            Log::info("Password untuk user {$user->email} telah direset oleh " . Auth::user()->email);
             DB::commit();
             session()->flash('success', 'Password user telah direset ke default.');
             return redirect()->route('users.index');
