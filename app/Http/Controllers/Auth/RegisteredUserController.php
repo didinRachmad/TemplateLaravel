@@ -20,7 +20,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        if (!auth()->check() || auth()->user()->role !== 'super_admin') {
+        if (!auth()->check() || Auth::user()->role !== 'super_admin') {
             abort(403, 'Unauthorized access.');
         }
 
@@ -36,11 +36,11 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . auth()->user()->class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . Auth::user()->class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = auth()->user()->create([
+        $user = Auth::user()->create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),

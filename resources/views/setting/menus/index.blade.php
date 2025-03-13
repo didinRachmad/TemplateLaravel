@@ -13,7 +13,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="display-6 fw-bold mb-0">Daftar Menu</div>
 
-                @if (auth()->user()->hasMenuPermission($menu_id->id, 'create'))
+                @if (Auth::user()->hasMenuPermission($menu_id->id, 'create'))
                     <a class="btn btn-sm rounded-lg btn-primary shadow-sm" href="{{ route('menus.create') }}">
                         <i class="bi bi-plus-circle-fill"></i> Tambah Data
                     </a>
@@ -43,7 +43,7 @@
                         <td class="text-center">
                             <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
                                 {{-- <div class="btn btn-sm rounded-lg btn-group" role="group"> --}}
-                                @if (auth()->user()->hasMenuPermission($menu_id->id, 'edit'))
+                                @if (Auth::user()->hasMenuPermission($menu_id->id, 'edit'))
                                     <a href="{{ route('menus.edit', $menu_id->id) }}"
                                         class="btn btn-sm rounded-lg btn-outline-warning" data-bs-toggle="tooltip"
                                         data-bs-title="Edit">
@@ -51,7 +51,7 @@
                                     </a>
                                 @endif
 
-                                @if (auth()->user()->hasMenuPermission($menu_id->id, 'destroy'))
+                                @if (Auth::user()->hasMenuPermission($menu_id->id, 'destroy'))
                                     <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
                                         class="form-delete d-inline">
                                         @csrf
