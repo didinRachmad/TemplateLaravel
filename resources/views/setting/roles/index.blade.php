@@ -13,7 +13,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="display-6 fw-bold mb-0">Daftar Roles</div>
 
-                @if (auth()->user()->hasMenuPermission($menu->id, 'create'))
+                @if (Auth::user()->hasMenuPermission($menu->id, 'create'))
                     <a class="btn btn-sm rounded-lg btn-primary shadow-sm" href="{{ route('roles.create') }}">
                         <i class="bi bi-plus-circle-fill"></i> Tambah Data
                     </a>
@@ -36,14 +36,14 @@
                         <td>{{ $role->name }}</td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center align-items-center flex-nowrap gap-1">
-                                @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
+                                @if (Auth::user()->hasMenuPermission($menu->id, 'edit'))
                                     <a href="{{ route('roles.menu-permissions', $role->id) }}"
                                         class="btn btn-sm rounded-lg btn-outline-info" data-bs-toggle="tooltip"
                                         data-bs-title="Atur Permissions">
                                         <i class="bi bi-sliders"></i>
                                     </a>
                                 @endif
-                                @if (auth()->user()->hasMenuPermission($menu->id, 'edit'))
+                                @if (Auth::user()->hasMenuPermission($menu->id, 'edit'))
                                     <a href="{{ route('roles.edit', $role->id) }}"
                                         class="btn btn-sm rounded-lg btn-outline-warning" data-bs-toggle="tooltip"
                                         data-bs-title="Edit">
@@ -51,7 +51,7 @@
                                     </a>
                                 @endif
 
-                                @if (auth()->user()->hasMenuPermission($menu->id, 'destroy'))
+                                @if (Auth::user()->hasMenuPermission($menu->id, 'destroy'))
                                     <form action="{{ route('roles.destroy', $role->id) }}" method="POST"
                                         class="form-delete d-inline">
                                         @csrf

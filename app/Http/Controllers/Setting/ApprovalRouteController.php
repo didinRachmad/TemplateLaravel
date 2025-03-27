@@ -8,6 +8,7 @@ use App\Models\ApprovalRoute;
 use App\Models\Menu;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApprovalRouteController extends Controller
@@ -29,7 +30,7 @@ class ApprovalRouteController extends Controller
     {
         $menus = Menu::whereNotNull('route')->orderBy('order')->get();
         $roles = Role::all();
-        $users = auth()->user()->all();
+        $users = Auth::user()->all();
         return view('setting.approval_routes.create', compact('roles', 'users', 'menus'));
     }
 
@@ -66,7 +67,7 @@ class ApprovalRouteController extends Controller
         $route = ApprovalRoute::findOrFail($id);
         $menus = Menu::orderBy('order')->get();
         $roles = Role::all();
-        $users = auth()->user()->all();
+        $users = Auth::user()->all();
         return view('setting.approval_routes.edit', compact('route', 'roles', 'users', 'menus'));
     }
 

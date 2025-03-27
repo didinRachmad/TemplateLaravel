@@ -1,10 +1,16 @@
-// resources/js/item.js
 export default {
-    initIndex() {
-        console.log('Halaman Item Index berhasil dimuat!');
-        let table;
-        table = $("#datatables").DataTable({
-            dom: "<'row'<'col-sm-12 col-md-3'l><'col-sm-12 col-md-6 mb-3 mb-md-0 d-flex justify-content-center align-items-center'><'col-sm-12 col-md-3 text-right'f>>" +
+    async initIndex() {
+        console.log("Halaman Item Index berhasil dimuat!");
+
+        // Dynamic import DataTables hanya jika diperlukan
+        await Promise.all([
+            import("datatables.net-bs5"),
+            import("datatables.net-buttons-bs5"),
+        ]);
+
+        const table = $("#datatables").DataTable({
+            dom:
+                "<'row'<'col-sm-12 col-md-3'l><'col-sm-12 col-md-6 mb-3 mb-md-0 d-flex justify-content-center align-items-center'><'col-sm-12 col-md-3 text-right'f>>" +
                 "<'row py-2'<'col-sm-12 table-responsive'tr>>" +
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             paging: true,
@@ -18,7 +24,7 @@ export default {
             columnDefs: [
                 {
                     targets: 0, // Menargetkan kolom pertama
-                    className: 'text-center', // Menambahkan kelas text-center untuk meratakan teks ke tengah
+                    className: "text-center", // Menambahkan kelas text-center untuk meratakan teks ke tengah
                 },
             ],
             info: true,
@@ -41,8 +47,10 @@ export default {
                 //     sPrevious: "Sebelumnya",
                 // },
                 oAria: {
-                    sSortAscending: ": aktifkan untuk mengurutkan kolom secara menaik",
-                    sSortDescending: ": aktifkan untuk mengurutkan kolom secara menurun",
+                    sSortAscending:
+                        ": aktifkan untuk mengurutkan kolom secara menaik",
+                    sSortDescending:
+                        ": aktifkan untuk mengurutkan kolom secara menurun",
                 },
             },
         });
@@ -62,22 +70,26 @@ export default {
             .draw();
     },
     initShow() {
-        console.log('Halaman Item Show berhasil dimuat!');
+        console.log("Halaman Item Show berhasil dimuat!");
+        // FANCYBOX INIT
+        import("@fancyapps/ui").then(({ Fancybox }) => {
+            Fancybox.bind("[data-fancybox]");
+        });
     },
     initCreate() {
-        console.log('Halaman Item Create berhasil dimuat!');
-        $('#kode_item').select2({
-            theme: 'bootstrap-5',
+        console.log("Halaman Item Create berhasil dimuat!");
+        $("#kode_item").select2({
+            theme: "bootstrap-5",
             ajax: {
                 url: API_URLS.items,
-                dataType: 'json',
+                dataType: "json",
                 delay: 250,
                 data: function (params) {
                     return {
                         term: params.term,
                         search: {
-                            value: params.term
-                        }
+                            value: params.term,
+                        },
                     };
                 },
                 processResults: function (data) {
@@ -85,17 +97,16 @@ export default {
                         results: $.map(data.data, function (item) {
                             return {
                                 id: item.bkode, // Gunakan bkode sebagai id
-                                text: item
-                                    .bnama, // Gunakan bnama sebagai teks yang ditampilkan
+                                text: item.bnama, // Gunakan bnama sebagai teks yang ditampilkan
                                 bnama: item.bnama,
-                                bsatuandefault: item.bsatuandefault
+                                bsatuandefault: item.bsatuandefault,
                             };
-                        })
+                        }),
                     };
                 },
-                cache: true
+                cache: true,
             },
-            placeholder: 'Pilih Item',
+            placeholder: "Pilih Item",
             minimumInputLength: 1,
             templateResult: function (item) {
                 if (item.loading) {
@@ -103,102 +114,45 @@ export default {
                 }
                 var $container = $(
                     "<div class='select2-result-item clearfix'>" +
-                    "<div class='select2-result-item__meta'>" +
-                    "<div class='select2-result-item__title'></div>" +
-                    "<div class='select2-result-item__subtitle'></div>" +
-                    "</div>" +
-                    "</div>"
+                        "<div class='select2-result-item__meta'>" +
+                        "<div class='select2-result-item__title'></div>" +
+                        "<div class='select2-result-item__subtitle'></div>" +
+                        "</div>" +
+                        "</div>"
                 );
-                $container.find(".select2-result-item__title").text(item.id + ' - ' +
-                    item.text);
-                $container.find(".select2-result-item__subtitle").text(item
-                    .bsatuandefault);
+                $container
+                    .find(".select2-result-item__title")
+                    .text(item.id + " - " + item.text);
+                $container
+                    .find(".select2-result-item__subtitle")
+                    .text(item.bsatuandefault);
                 return $container;
             },
             templateSelection: function (item) {
                 return item.id;
-            }
+            },
         });
         // Event handler untuk memperbarui input field read-only
-        $('#kode_item').on('select2:select', function (e) {
+        $("#kode_item").on("select2:select", function (e) {
             var data = e.params.data;
-            $('#nama_item').val(data.text); // Perbarui nilai input read-only dengan bnama
-            $('#satuan').val(data.bsatuandefault); // Perbarui nilai input read-only dengan bsatuandefault
+            $("#nama_item").val(data.text); // Perbarui nilai input read-only dengan bnama
+            $("#satuan").val(data.bsatuandefault); // Perbarui nilai input read-only dengan bsatuandefault
         });
-
-        // $('#kode_lokasi').select2({
-        //     theme: 'bootstrap-5',
-        //     ajax: {
-        //         url: 'http://10.252.2.166/api-vms/public/api/master/location/listapi',
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function (params) {
-        //             return {
-        //                 term: params.term,
-        //                 search: {
-        //                     value: params.term
-        //                 }
-        //             };
-        //         },
-        //         processResults: function (data) {
-        //             return {
-        //                 results: $.map(data.data, function (location) {
-        //                     return {
-        //                         id: location.lkode, // Gunakan lkode sebagai id
-        //                         text: location
-        //                             .lnama, // Gunakan lnama sebagai teks yang ditampilkan
-        //                         lnama: location.lnama,
-        //                         lkodetransaksi: location.lkodetransaksi
-        //                     };
-        //                 })
-        //             };
-        //         },
-        //         cache: true
-        //     },
-        //     placeholder: 'Pilih Lokasi',
-        //     minimumInputLength: 1,
-        //     templateResult: function (location) {
-        //         if (location.loading) {
-        //             return location.text;
-        //         }
-        //         var $container = $(
-        //             "<div class='select2-result-location clearfix'>" +
-        //             "<div class='select2-result-location__meta'>" +
-        //             "<div class='select2-result-location__title'></div>" +
-        //             "<div class='select2-result-location__subtitle'></div>" +
-        //             "</div>" +
-        //             "</div>"
-        //         );
-        //         $container.find(".select2-result-location__title").text(location.id +
-        //             ' - ' + location.text);
-        //         $container.find(".select2-result-location__subtitle").text(
-        //             'Kode Transaksi: ' + location.lkodetransaksi);
-        //         return $container;
-        //     },
-        //     templateSelection: function (location) {
-        //         return location.id;
-        //     }
-        // });
-        // // Event handler untuk memperbarui input field read-only
-        // $('#kode_lokasi').on('select2:select', function (e) {
-        //     var data = e.params.data;
-        //     $('#nama_lokasi').val(data.text); // Perbarui nilai input read-only dengan bnama
-        // });
     },
     initEdit() {
-        console.log('Halaman Item Edit berhasil dimuat!');
-        $('#kode_item').select2({
-            theme: 'bootstrap-5',
+        console.log("Halaman Item Edit berhasil dimuat!");
+        $("#kode_item").select2({
+            theme: "bootstrap-5",
             ajax: {
                 url: API_URLS.items,
-                dataType: 'json',
+                dataType: "json",
                 delay: 250,
                 data: function (params) {
                     return {
                         term: params.term,
                         search: {
-                            value: params.term
-                        }
+                            value: params.term,
+                        },
                     };
                 },
                 processResults: function (data) {
@@ -206,17 +160,16 @@ export default {
                         results: $.map(data.data, function (item) {
                             return {
                                 id: item.bkode, // Gunakan bkode sebagai id
-                                text: item
-                                    .bnama, // Gunakan bnama sebagai teks yang ditampilkan
+                                text: item.bnama, // Gunakan bnama sebagai teks yang ditampilkan
                                 bnama: item.bnama,
-                                bsatuandefault: item.bsatuandefault
+                                bsatuandefault: item.bsatuandefault,
                             };
-                        })
+                        }),
                     };
                 },
-                cache: true
+                cache: true,
             },
-            placeholder: 'Pilih Item',
+            placeholder: "Pilih Item",
             minimumInputLength: 1,
             templateResult: function (item) {
                 if (item.loading) {
@@ -224,86 +177,29 @@ export default {
                 }
                 var $container = $(
                     "<div class='select2-result-item clearfix'>" +
-                    "<div class='select2-result-item__meta'>" +
-                    "<div class='select2-result-item__title'></div>" +
-                    "<div class='select2-result-item__subtitle'></div>" +
-                    "</div>" +
-                    "</div>"
+                        "<div class='select2-result-item__meta'>" +
+                        "<div class='select2-result-item__title'></div>" +
+                        "<div class='select2-result-item__subtitle'></div>" +
+                        "</div>" +
+                        "</div>"
                 );
-                $container.find(".select2-result-item__title").text(item.id + ' - ' +
-                    item.text);
-                $container.find(".select2-result-item__subtitle").text(item
-                    .bsatuandefault);
+                $container
+                    .find(".select2-result-item__title")
+                    .text(item.id + " - " + item.text);
+                $container
+                    .find(".select2-result-item__subtitle")
+                    .text(item.bsatuandefault);
                 return $container;
             },
             templateSelection: function (item) {
                 return item.id;
-            }
+            },
         });
         // Event handler untuk memperbarui input field read-only
-        $('#kode_item').on('select2:select', function (e) {
+        $("#kode_item").on("select2:select", function (e) {
             var data = e.params.data;
-            $('#nama_item').val(data.text); // Perbarui nilai input read-only dengan bnama
-            $('#satuan').val(data.bsatuandefault); // Perbarui nilai input read-only dengan bsatuandefault
+            $("#nama_item").val(data.text); // Perbarui nilai input read-only dengan bnama
+            $("#satuan").val(data.bsatuandefault); // Perbarui nilai input read-only dengan bsatuandefault
         });
-
-        // $('#kode_lokasi').select2({
-        //     theme: 'bootstrap-5',
-        //     ajax: {
-        //         url: 'http://10.252.2.166/api-vms/public/api/master/location/listapi',
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function (params) {
-        //             return {
-        //                 term: params.term,
-        //                 search: {
-        //                     value: params.term
-        //                 }
-        //             };
-        //         },
-        //         processResults: function (data) {
-        //             return {
-        //                 results: $.map(data.data, function (location) {
-        //                     return {
-        //                         id: location.lkode, // Gunakan lkode sebagai id
-        //                         text: location
-        //                             .lnama, // Gunakan lnama sebagai teks yang ditampilkan
-        //                         lnama: location.lnama,
-        //                         lkodetransaksi: location.lkodetransaksi
-        //                     };
-        //                 })
-        //             };
-        //         },
-        //         cache: true
-        //     },
-        //     placeholder: 'Pilih Lokasi',
-        //     minimumInputLength: 1,
-        //     templateResult: function (location) {
-        //         if (location.loading) {
-        //             return location.text;
-        //         }
-        //         var $container = $(
-        //             "<div class='select2-result-location clearfix'>" +
-        //             "<div class='select2-result-location__meta'>" +
-        //             "<div class='select2-result-location__title'></div>" +
-        //             "<div class='select2-result-location__subtitle'></div>" +
-        //             "</div>" +
-        //             "</div>"
-        //         );
-        //         $container.find(".select2-result-location__title").text(location.id +
-        //             ' - ' + location.text);
-        //         $container.find(".select2-result-location__subtitle").text(
-        //             'Kode Transaksi: ' + location.lkodetransaksi);
-        //         return $container;
-        //     },
-        //     templateSelection: function (location) {
-        //         return location.id;
-        //     }
-        // });
-        // // Event handler untuk memperbarui input field read-only
-        // $('#kode_lokasi').on('select2:select', function (e) {
-        //     var data = e.params.data;
-        //     $('#nama_lokasi').val(data.text); // Perbarui nilai input read-only dengan bnama
-        // });
-    }
+    },
 };

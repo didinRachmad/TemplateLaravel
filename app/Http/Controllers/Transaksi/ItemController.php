@@ -35,7 +35,7 @@ class ItemController extends Controller
     //     }
 
     //     // Ambil role user saat ini
-    //     $currentRoleName = auth()->user()->getRoleNames()->first();
+    //     $currentRoleName = Auth::user()->getRoleNames()->first();
     //     $role = Role::where('name', $currentRoleName)->first();
 
     //     // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
@@ -81,7 +81,7 @@ class ItemController extends Controller
         }
 
         // Ambil role user saat ini
-        $currentRoleName = auth()->user()->getRoleNames()->first();
+        $currentRoleName = Auth::user()->getRoleNames()->first();
         $role = Role::where('name', $currentRoleName)->first();
 
         // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
@@ -110,7 +110,7 @@ class ItemController extends Controller
     public function show(Item $item)
     {
         // Ambil role user saat ini (asumsi user hanya punya satu role)
-        $currentRoleName = auth()->user()->getRoleNames()->first();
+        $currentRoleName = Auth::user()->getRoleNames()->first();
         $role = Role::where('name', $currentRoleName)->first();
         // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
         $approvalRoute = ApprovalRoute::where('module', 'items')->where('role_id', $role->id)->first();
@@ -316,7 +316,7 @@ class ItemController extends Controller
         $menu = Menu::where('route', 'items')->first();
 
         // Ambil role user saat ini
-        $currentRoleName = auth()->user()->getRoleNames()->first();
+        $currentRoleName = Auth::user()->getRoleNames()->first();
         $role = Role::where('name', $currentRoleName)->first();
 
         // Ambil konfigurasi approval untuk module 'items' berdasarkan role user
@@ -409,7 +409,7 @@ class ItemController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-        $roleName = auth()->user()->getRoleNames()->first();
+        $roleName = Auth::user()->getRoleNames()->first();
 
         DB::beginTransaction();
 
@@ -438,7 +438,7 @@ class ItemController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-        $roleName = auth()->user()->getRoleNames()->first();
+        $roleName = Auth::user()->getRoleNames()->first();
 
         DB::beginTransaction();
 

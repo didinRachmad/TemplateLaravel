@@ -9,6 +9,7 @@ use App\Models\Produksi;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -33,23 +34,23 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'         => 'required|string|max:255',
-            'email'        => 'required|email|max:255|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users',
             // Ubah validasi agar 'produksi' adalah array (jika kosong, tidak masalah)
-            'produksi'     => 'nullable|array',
-            'produksi.*'   => 'exists:master_produksi,id',
-            'contact'      => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
-            'password'     => 'required|string|min:8|confirmed',
-            'role_id'      => 'required|exists:roles,id',
+            'produksi' => 'nullable|array',
+            'produksi.*' => 'exists:master_produksi,id',
+            'contact' => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
+            'password' => 'required|string|min:8|confirmed',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
+                'name' => $validated['name'],
+                'email' => $validated['email'],
                 // Kolom produksi_id tidak lagi digunakan karena relasi dikelola lewat pivot table
-                'contact'  => $validated['contact'] ?? null,
+                'contact' => $validated['contact'] ?? null,
                 'password' => bcrypt($validated['password']),
             ]);
 
@@ -84,20 +85,20 @@ class UserManagementController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name'         => 'required|string',
-            'email'        => 'required|email',
+            'name' => 'required|string',
+            'email' => 'required|email',
             // Ubah validasi agar 'produksi' adalah array dan setiap elemen harus ada di master_produksi
-            'produksi'     => 'nullable|array',
-            'produksi.*'   => 'exists:master_produksi,id',
-            'contact'      => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
+            'produksi' => 'nullable|array',
+            'produksi.*' => 'exists:master_produksi,id',
+            'contact' => 'nullable|regex:/^\+[1-9]\d{1,14}$/',
         ]);
 
         DB::beginTransaction();
         try {
             // Update data user selain relasi produksi
             $user->update([
-                'name'    => $validated['name'],
-                'email'   => $validated['email'],
+                'name' => $validated['name'],
+                'email' => $validated['email'],
                 'contact' => $validated['contact'] ?? null,
             ]);
 
@@ -132,7 +133,7 @@ class UserManagementController extends Controller
                 'password' => Hash::make($defaultPassword),
             ]);
 
-            Log::info("Password untuk user {$user->email} telah direset oleh " . auth()->user()->email);
+            Log::info("Password untuk user {$user->email} telah direset oleh " . Auth::user()->email);
             DB::commit();
             session()->flash('success', 'Password user telah direset ke default.');
             return redirect()->route('users.index');
@@ -147,7 +148,7 @@ class UserManagementController extends Controller
     public function destroy(User $user)
     {
         // Cegah super_admin menghapus dirinya sendiri
-        if (auth()->id() === $user->id) {
+        if (Auth::id() === $user->id) {
             return redirect()->route('users.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
