@@ -152,3 +152,17 @@ div.dt-paging ul.pagination {
 .filepond--credits {
     display: none;
 }
+
+/* STYLE MENU */
+.hover\:text-gray-900:hover {
+    color: rgb(44 169 188) !important;
+    transform: scale(1.05) !important;
+}
+
+.hover\:bg-gray-100:hover {
+    color: rgb(44 169 188) !important;
+}
+
+.active-menu {
+    color: rgb(44, 169, 188) !important;
+}

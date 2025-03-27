@@ -28,8 +28,8 @@
         </div>
     </div>
 
-    <div class="min-h-screen bg-gray-100" style="margin-top: 60px;">
-        @include('layouts.navigation')
+    @include('layouts.navigation')
+    <div class="min-h-screen bg-gray-100" style="padding-top: 60px;">
 
         <!-- Page Heading -->
         {{-- @if (isset($header))

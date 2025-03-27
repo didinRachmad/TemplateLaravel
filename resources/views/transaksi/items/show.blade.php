@@ -124,16 +124,15 @@
                 @if (!($item->approval_level > 0))
                     <form action="{{ route('items.approve', $item->id) }}" method="POST" class="d-inline form-approval">
                         @csrf
-                        <button type="submit" class="btn btn-sm rounded-lg btn-sm btn-outline-success btn-approve">
+                        <button type="submit" class="btn btn-sm rounded-lg btn-outline-success btn-approve">
                             <i class="bi bi-check2-square"></i> Ajukan
                         </button>
                     </form>
                 @else
                     <!-- Dropdown Action untuk Approve, Reject, dan Revise -->
                     <div class="dropdown">
-                        <button class="btn btn-sm rounded-lg btn-sm btn-outline-success dropdown-toggle h-100"
-                            type="button" id="actionDropdown{{ $item->id }}" data-bs-toggle="dropdown"
-                            aria-expanded="false">
+                        <button class="btn btn-sm rounded-lg btn-outline-success dropdown-toggle h-100" type="button"
+                            id="actionDropdown{{ $item->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                             Action
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $item->id }}">
@@ -162,7 +161,7 @@
                     </div>
                 @endif
             @endif
-            <a href="{{ route('items.index') }}" class="btn btn-sm rounded-lg btn-sm btn-outline-secondary d-inline">
+            <a href="{{ route('items.index') }}" class="btn btn-sm rounded-lg btn-outline-secondary d-inline">
                 Kembali <i class="bi bi-x-square-fill"></i>
             </a>
         </div>

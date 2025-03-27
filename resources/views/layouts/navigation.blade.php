@@ -51,7 +51,8 @@
                                                     </x-dropdown-link>
                                                     <div x-show="open" @click.away="open = false" class="ml-4">
                                                         @foreach ($child->children as $subchild)
-                                                            <x-dropdown-link :href="url($subchild->route)" :active="isActiveMenu($subchild->route)">
+                                                            <x-dropdown-link :href="url($subchild->route)" :active="isActiveMenu($subchild->route)"
+                                                                class="{{ isActiveMenu($subchild->route) ? 'active-menu ' : '' }}">
                                                                 @if ($subchild->icon)
                                                                     <i class="{{ $subchild->icon }} mr-1"></i>
                                                                 @endif
@@ -61,7 +62,8 @@
                                                     </div>
                                                 </div>
                                             @else
-                                                <x-dropdown-link :href="url($child->route)" :active="isActiveMenu($child->route)">
+                                                <x-dropdown-link :href="url($child->route)" :active="isActiveMenu($child->route)"
+                                                    class="{{ isActiveMenu($child->route) ? 'active-menu ' : '' }}">
                                                     @if ($child->icon)
                                                         <i class="{{ $child->icon }} mr-1"></i>
                                                     @endif
@@ -75,7 +77,8 @@
                         </div>
                     @else
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <x-nav-link :href="url($menu->route)" :active="isActiveMenu($menu->route)">
+                            <x-nav-link :href="url($menu->route)" :active="isActiveMenu($menu->route)"
+                                class="{{ isActiveMenu($menu->route) ? 'active-menu' : '' }} hover:text-gray-900">
                                 @if ($menu->icon)
                                     <i class="{{ $menu->icon }} mr-1"></i>
                                 @endif
@@ -154,7 +157,7 @@
                         <div x-show="open" class="space-y-1">
                             @foreach ($menu->children as $child)
                                 <x-responsive-nav-link :href="url($child->route)" :active="isActiveMenu($child->route)"
-                                    class="block pl-8 pr-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    class="{{ isActiveMenu($child->route) ? 'active-menu ' : '' }}block pl-8 pr-4 py-2 text-gray-700 hover:bg-gray-100">
                                     @if ($child->icon)
                                         <i class="{{ $child->icon }} mr-1"></i>
                                     @endif
@@ -165,7 +168,7 @@
                     </div>
                 @else
                     <x-responsive-nav-link :href="url($menu->route)" :active="isActiveMenu($menu->route)"
-                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        class="{{ isActiveMenu($menu->route) ? 'active-menu ' : '' }}block px-4 py-2 text-gray-700 hover:bg-gray-100">
                         @if ($menu->icon)
                             <i class="{{ $menu->icon }} mr-1"></i>
                         @endif
